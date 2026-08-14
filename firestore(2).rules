@@ -1,0 +1,175 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isCurrentUser(userId) {
+      return isSignedIn() &&
+        request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ) &&
+        get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.role == "admin";
+    }
+
+    function isValidUniqueOpenUpdate() {
+      return isSignedIn() &&
+        request.resource.data
+          .diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            "openedBy",
+            "openCount",
+            "lastOpenedAt"
+          ]) &&
+        request.resource.data.openedBy is list &&
+        request.resource.data.openCount is int &&
+        request.resource.data.openCount ==
+          request.resource.data.openedBy.size() &&
+        request.resource.data.lastOpenedAt ==
+          request.time &&
+        (
+          (
+            !("openedBy" in resource.data) &&
+            request.resource.data.openedBy.size() == 1 &&
+            request.resource.data.openedBy.hasOnly([
+              request.auth.uid
+            ])
+          ) ||
+          (
+            resource.data.openedBy is list &&
+            !resource.data.openedBy.hasAny([
+              request.auth.uid
+            ]) &&
+            request.resource.data.openedBy.hasAny([
+              request.auth.uid
+            ]) &&
+            request.resource.data.openedBy.size() ==
+              resource.data.openedBy.size() + 1 &&
+            request.resource.data.openedBy.hasAll(
+              resource.data.openedBy
+            )
+          )
+        );
+    }
+
+    function isValidLikeUpdate() {
+      return isSignedIn() &&
+        request.resource.data
+          .diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            "likedBy",
+            "likeCount"
+          ]) &&
+        request.resource.data.likedBy is list &&
+        request.resource.data.likeCount is int &&
+        request.resource.data.likeCount ==
+          request.resource.data.likedBy.size() &&
+        (
+          (
+            !resource.data.likedBy.hasAny([
+              request.auth.uid
+            ]) &&
+            request.resource.data.likedBy.hasAny([
+              request.auth.uid
+            ]) &&
+            request.resource.data.likedBy.size() ==
+              resource.data.likedBy.size() + 1 &&
+            request.resource.data.likedBy.hasAll(
+              resource.data.likedBy
+            )
+          ) ||
+          (
+            resource.data.likedBy.hasAny([
+              request.auth.uid
+            ]) &&
+            !request.resource.data.likedBy.hasAny([
+              request.auth.uid
+            ]) &&
+            resource.data.likedBy.size() ==
+              request.resource.data.likedBy.size() + 1 &&
+            resource.data.likedBy.hasAll(
+              request.resource.data.likedBy
+            )
+          )
+        );
+    }
+
+    function isValidOwnUserUpdate(userId) {
+      return isCurrentUser(userId) &&
+        request.resource.data
+          .diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            "name",
+            "email",
+            "lastActiveAt",
+            "updatedAt",
+            "expoPushTokens",
+            "notificationsEnabled",
+            "pushTokenUpdatedAt"
+          ]) &&
+        (
+          !("expoPushTokens" in request.resource.data) ||
+          request.resource.data.expoPushTokens is list
+        );
+    }
+
+    match /users/{userId} {
+      allow get: if isCurrentUser(userId) ||
+        isAdmin();
+
+      allow list: if isAdmin();
+
+      allow create: if isCurrentUser(userId) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.role == "user";
+
+      allow update: if isAdmin() ||
+        isValidOwnUserUpdate(userId);
+
+      allow delete: if isAdmin();
+    }
+
+    match /offers/{offerId} {
+      allow read: if true;
+      allow create: if isAdmin();
+
+      allow update: if isAdmin() ||
+        isValidUniqueOpenUpdate() ||
+        isValidLikeUpdate();
+
+      allow delete: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isAdmin();
+
+      allow update: if isAdmin() ||
+        isValidUniqueOpenUpdate() ||
+        isValidLikeUpdate();
+
+      allow delete: if isAdmin();
+    }
+
+    match /firebaseTests/{testId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

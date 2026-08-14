@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   collection,
   doc,
@@ -9,7 +10,11 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -22,7 +27,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { auth, db } from "../../firebase/firebaseConfig";
+import {
+  auth,
+  db,
+} from "../../firebase/firebaseConfig";
 
 type Product = {
   id: string;
@@ -34,14 +42,33 @@ type Product = {
   isActive: boolean;
   likeCount: number;
   likedBy: string[];
+  expiresAt: Timestamp | null;
   createdAt?: Timestamp | null;
 };
 
 export default function ProductsScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<
+    Product[]
+  >([]);
+
+  const [currentTime, setCurrentTime] = useState(
+    Date.now()
+  );
+
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [updatingLikeId, setUpdatingLikeId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const [updatingLikeId, setUpdatingLikeId] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60_000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const productsQuery = query(
@@ -53,36 +80,64 @@ export default function ProductsScreen() {
     const unsubscribe = onSnapshot(
       productsQuery,
       (snapshot) => {
-        const loadedProducts: Product[] = snapshot.docs.map((document) => {
-          const data = document.data();
+        const loadedProducts: Product[] =
+          snapshot.docs.map((document) => {
+            const data = document.data();
 
-          return {
-            id: document.id,
-            name: data.name ?? "",
-            description: data.description ?? "",
-            price: data.price ?? 0,
-            imageBase64: data.imageBase64 ?? null,
-            imageUrl: data.imageUrl ?? null,
-            isActive: data.isActive ?? true,
-            likeCount: data.likeCount ?? 0,
-            likedBy: Array.isArray(data.likedBy) ? data.likedBy : [],
-            createdAt: data.createdAt ?? null,
-          };
-        });
+            return {
+              id: document.id,
+              name: data.name ?? "",
+              description: data.description ?? "",
+              price: data.price ?? 0,
+              imageBase64:
+                data.imageBase64 ?? null,
+              imageUrl: data.imageUrl ?? null,
+              isActive: data.isActive ?? true,
+              likeCount: data.likeCount ?? 0,
+              likedBy: Array.isArray(data.likedBy)
+                ? data.likedBy
+                : [],
+              expiresAt:
+                data.expiresAt instanceof Timestamp
+                  ? data.expiresAt
+                  : null,
+              createdAt: data.createdAt ?? null,
+            };
+          });
 
-        setProducts(loadedProducts);
+        setAllProducts(loadedProducts);
         setIsLoading(false);
         setErrorMessage("");
+        setCurrentTime(Date.now());
       },
       (error) => {
-        console.error("Feil ved henting av produkter:", error);
-        setErrorMessage("Kunne ikke hente produktene.");
+        console.error(
+          "Feil ved henting av produkter:",
+          error
+        );
+
+        setErrorMessage(
+          "Kunne ikke hente produktene."
+        );
+
         setIsLoading(false);
       }
     );
 
     return unsubscribe;
   }, []);
+
+  const products = useMemo(() => {
+    return allProducts.filter((product) => {
+      if (!product.expiresAt) {
+        return true;
+      }
+
+      return (
+        product.expiresAt.toMillis() > currentTime
+      );
+    });
+  }, [allProducts, currentTime]);
 
   function formatPrice(price: number) {
     return price.toLocaleString("nb-NO", {
@@ -91,7 +146,27 @@ export default function ProductsScreen() {
     });
   }
 
+  function formatExpirationDate(
+    expiration: Timestamp
+  ) {
+    return expiration.toDate().toLocaleDateString(
+      "nb-NO",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }
+    );
+  }
 
+  function openProductDetails(productId: string) {
+    router.push({
+      pathname: "/product-details",
+      params: {
+        id: productId,
+      },
+    });
+  }
 
   async function toggleLike(product: Product) {
     const currentUser = auth.currentUser;
@@ -101,6 +176,7 @@ export default function ProductsScreen() {
         "Logg inn",
         "Du må være logget inn for å like et produkt."
       );
+
       return;
     }
 
@@ -111,33 +187,60 @@ export default function ProductsScreen() {
     try {
       setUpdatingLikeId(product.id);
 
-      const productReference = doc(db, "products", product.id);
+      const productReference = doc(
+        db,
+        "products",
+        product.id
+      );
 
-      await runTransaction(db, async (transaction) => {
-        const snapshot = await transaction.get(productReference);
+      await runTransaction(
+        db,
+        async (transaction) => {
+          const snapshot =
+            await transaction.get(
+              productReference
+            );
 
-        if (!snapshot.exists()) {
-          throw new Error("Produktet finnes ikke.");
+          if (!snapshot.exists()) {
+            throw new Error(
+              "Produktet finnes ikke."
+            );
+          }
+
+          const data = snapshot.data();
+
+          const likedBy: string[] = Array.isArray(
+            data.likedBy
+          )
+            ? data.likedBy
+            : [];
+
+          const hasLiked = likedBy.includes(
+            currentUser.uid
+          );
+
+          const nextLikedBy = hasLiked
+            ? likedBy.filter(
+                (uid) => uid !== currentUser.uid
+              )
+            : [...likedBy, currentUser.uid];
+
+          transaction.update(productReference, {
+            likedBy: nextLikedBy,
+            likeCount: nextLikedBy.length,
+          });
         }
-
-        const data = snapshot.data();
-        const likedBy: string[] = Array.isArray(data.likedBy)
-          ? data.likedBy
-          : [];
-
-        const hasLiked = likedBy.includes(currentUser.uid);
-        const nextLikedBy = hasLiked
-          ? likedBy.filter((uid) => uid !== currentUser.uid)
-          : [...likedBy, currentUser.uid];
-
-        transaction.update(productReference, {
-          likedBy: nextLikedBy,
-          likeCount: nextLikedBy.length,
-        });
-      });
+      );
     } catch (error) {
-      console.error("Feil ved liking av produkt:", error);
-      Alert.alert("Kunne ikke oppdatere", "Prøv igjen om litt.");
+      console.error(
+        "Feil ved liking av produkt:",
+        error
+      );
+
+      Alert.alert(
+        "Kunne ikke oppdatere",
+        "Prøv igjen om litt."
+      );
     } finally {
       setUpdatingLikeId(null);
     }
@@ -157,24 +260,37 @@ export default function ProductsScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <SafeAreaView
+        style={styles.safeArea}
+        edges={["top"]}
+      >
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#1F7A3D" />
-          <Text style={styles.loadingText}>Henter produkter...</Text>
+          <ActivityIndicator
+            size="large"
+            color="#1F7A3D"
+          />
+
+          <Text style={styles.loadingText}>
+            Henter produkter...
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top"]}
+    >
       <FlatList
         data={products}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.container,
-          products.length === 0 && styles.emptyListContainer,
+          products.length === 0 &&
+            styles.emptyListContainer,
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -185,13 +301,18 @@ export default function ProductsScreen() {
                 color="#2166A5"
               />
 
-              <Text style={styles.badgeText}>Nytt i butikken</Text>
+              <Text style={styles.badgeText}>
+                Nytt i butikken
+              </Text>
             </View>
 
-            <Text style={styles.title}>Nye produkter</Text>
+            <Text style={styles.title}>
+              Nye produkter
+            </Text>
 
             <Text style={styles.subtitle}>
-              Se de nyeste produktene som har kommet inn i butikken.
+              Se de nyeste produktene som har
+              kommet inn i butikken.
             </Text>
 
             {errorMessage ? (
@@ -202,7 +323,9 @@ export default function ProductsScreen() {
                   color="#A52626"
                 />
 
-                <Text style={styles.errorText}>{errorMessage}</Text>
+                <Text style={styles.errorText}>
+                  {errorMessage}
+                </Text>
               </View>
             ) : null}
           </View>
@@ -215,18 +338,38 @@ export default function ProductsScreen() {
               color="#8B968E"
             />
 
-            <Text style={styles.emptyTitle}>Ingen produkter ennå</Text>
+            <Text style={styles.emptyTitle}>
+              Ingen aktive produkter
+            </Text>
 
             <Text style={styles.emptyText}>
-              Nye produkter vil vises her når de publiseres av butikken.
+              Nye produkter vil vises her når de
+              publiseres av butikken.
             </Text>
           </View>
         }
         renderItem={({ item }) => {
-          const productImage = getProductImage(item);
+          const productImage =
+            getProductImage(item);
+
+          const hasLiked =
+            auth.currentUser !== null &&
+            item.likedBy.includes(
+              auth.currentUser.uid
+            );
 
           return (
-            <View style={styles.card}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.card,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() =>
+                openProductDetails(item.id)
+              }
+              accessibilityRole="button"
+              accessibilityLabel={`Åpne detaljer for ${item.name}`}
+            >
               <View style={styles.imageContainer}>
                 {productImage ? (
                   <Image
@@ -235,56 +378,114 @@ export default function ProductsScreen() {
                     resizeMode="cover"
                   />
                 ) : (
-                  <View style={styles.imagePlaceholder}>
+                  <View
+                    style={styles.imagePlaceholder}
+                  >
                     <Ionicons
                       name="cube-outline"
                       size={45}
                       color="#2166A5"
                     />
 
-                    <Text style={styles.noImageText}>Produktbilde</Text>
+                    <Text style={styles.noImageText}>
+                      Produktbilde
+                    </Text>
                   </View>
                 )}
 
                 <View style={styles.newBadge}>
-                  <Text style={styles.newBadgeText}>NY</Text>
+                  <Text style={styles.newBadgeText}>
+                    NY
+                  </Text>
                 </View>
 
                 <Pressable
                   style={({ pressed }) => [
                     styles.likeButton,
-                    pressed && styles.likeButtonPressed,
+                    pressed &&
+                      styles.likeButtonPressed,
                   ]}
-                  onPress={() => toggleLike(item)}
-                  disabled={updatingLikeId === item.id}
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    void toggleLike(item);
+                  }}
+                  disabled={
+                    updatingLikeId === item.id
+                  }
                 >
-                  <Ionicons
-                    name={
-                      auth.currentUser &&
-                      item.likedBy.includes(auth.currentUser.uid)
-                        ? "heart"
-                        : "heart-outline"
-                    }
-                    size={23}
-                    color="#D62828"
-                  />
+                  {updatingLikeId === item.id ? (
+                    <ActivityIndicator
+                      size="small"
+                      color="#D62828"
+                    />
+                  ) : (
+                    <>
+                      <Ionicons
+                        name={
+                          hasLiked
+                            ? "heart"
+                            : "heart-outline"
+                        }
+                        size={23}
+                        color="#D62828"
+                      />
 
-                  <Text style={styles.likeCount}>{item.likeCount}</Text>
+                      <Text style={styles.likeCount}>
+                        {item.likeCount}
+                      </Text>
+                    </>
+                  )}
                 </Pressable>
               </View>
 
               <View style={styles.cardContent}>
-                <Text style={styles.productName}>{item.name}</Text>
+                <Text style={styles.productName}>
+                  {item.name}
+                </Text>
 
-                <Text style={styles.description}>
+                <Text
+                  style={styles.description}
+                  numberOfLines={3}
+                >
                   {item.description}
                 </Text>
 
                 <Text style={styles.price}>
                   {formatPrice(item.price)} kr
                 </Text>
+
+                {item.expiresAt ? (
+                  <View style={styles.expirationRow}>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={17}
+                      color="#8A5A00"
+                    />
+
+                    <Text
+                      style={styles.expirationText}
+                    >
+                      Synlig til{" "}
+                      {formatExpirationDate(
+                        item.expiresAt
+                      )}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <View style={styles.detailsRow}>
+                  <Text style={styles.detailsText}>
+                    Se detaljer
+                  </Text>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color="#2166A5"
+                  />
+                </View>
               </View>
-            </View>
+            </Pressable>
           );
         }}
       />
@@ -352,6 +553,11 @@ const styles = StyleSheet.create({
     borderColor: "#E1E5E2",
   },
 
+  cardPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.99 }],
+  },
+
   imageContainer: {
     height: 190,
     position: "relative",
@@ -392,8 +598,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "900",
   },
-
-
 
   likeButton: {
     position: "absolute",
@@ -442,6 +646,39 @@ const styles = StyleSheet.create({
     fontSize: 21,
     fontWeight: "900",
     color: "#1F7A3D",
+  },
+
+  expirationRow: {
+    marginTop: 14,
+    padding: 11,
+    borderRadius: 11,
+    backgroundColor: "#FFF5DF",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+
+  expirationText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "800",
+    color: "#8A5A00",
+  },
+
+  detailsRow: {
+    marginTop: 16,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: "#EEEEEE",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  detailsText: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#2166A5",
   },
 
   centerContainer: {

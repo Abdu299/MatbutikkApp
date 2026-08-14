@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   collection,
   doc,
@@ -9,7 +10,11 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -22,7 +27,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { auth, db } from "../../firebase/firebaseConfig";
+import {
+  auth,
+  db,
+} from "../../firebase/firebaseConfig";
 
 type Offer = {
   id: string;
@@ -37,14 +45,33 @@ type Offer = {
   isActive: boolean;
   likeCount: number;
   likedBy: string[];
+  expiresAt: Timestamp | null;
   createdAt?: Timestamp | null;
 };
 
 export default function OffersScreen() {
-  const [offers, setOffers] = useState<Offer[]>([]);
+  const [allOffers, setAllOffers] = useState<
+    Offer[]
+  >([]);
+
+  const [currentTime, setCurrentTime] = useState(
+    Date.now()
+  );
+
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [updatingLikeId, setUpdatingLikeId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const [updatingLikeId, setUpdatingLikeId] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60_000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const offersQuery = query(
@@ -56,39 +83,66 @@ export default function OffersScreen() {
     const unsubscribe = onSnapshot(
       offersQuery,
       (snapshot) => {
-        const loadedOffers: Offer[] = snapshot.docs.map((document) => {
-          const data = document.data();
+        const loadedOffers: Offer[] =
+          snapshot.docs.map((document) => {
+            const data = document.data();
 
-          return {
-            id: document.id,
-            title: data.title ?? "",
-            description: data.description ?? "",
-            oldPrice: data.oldPrice ?? 0,
-            offerPrice: data.offerPrice ?? 0,
-            discountPercentage: data.discountPercentage ?? 0,
-            duration: data.duration ?? "",
-            imageBase64: data.imageBase64 ?? null,
-            imageUrl: data.imageUrl ?? null,
-            isActive: data.isActive ?? true,
-            likeCount: data.likeCount ?? 0,
-            likedBy: Array.isArray(data.likedBy) ? data.likedBy : [],
-            createdAt: data.createdAt ?? null,
-          };
-        });
+            return {
+              id: document.id,
+              title: data.title ?? "",
+              description: data.description ?? "",
+              oldPrice: data.oldPrice ?? 0,
+              offerPrice: data.offerPrice ?? 0,
+              discountPercentage:
+                data.discountPercentage ?? 0,
+              duration: data.duration ?? "",
+              imageBase64:
+                data.imageBase64 ?? null,
+              imageUrl: data.imageUrl ?? null,
+              isActive: data.isActive ?? true,
+              likeCount: data.likeCount ?? 0,
+              likedBy: Array.isArray(data.likedBy)
+                ? data.likedBy
+                : [],
+              expiresAt:
+                data.expiresAt instanceof Timestamp
+                  ? data.expiresAt
+                  : null,
+              createdAt: data.createdAt ?? null,
+            };
+          });
 
-        setOffers(loadedOffers);
+        setAllOffers(loadedOffers);
         setIsLoading(false);
         setErrorMessage("");
+        setCurrentTime(Date.now());
       },
       (error) => {
-        console.error("Feil ved henting av tilbud:", error);
-        setErrorMessage("Kunne ikke hente tilbudene.");
+        console.error(
+          "Feil ved henting av tilbud:",
+          error
+        );
+
+        setErrorMessage(
+          "Kunne ikke hente tilbudene."
+        );
+
         setIsLoading(false);
       }
     );
 
     return unsubscribe;
   }, []);
+
+  const offers = useMemo(() => {
+    return allOffers.filter((offer) => {
+      if (!offer.expiresAt) {
+        return true;
+      }
+
+      return offer.expiresAt.toMillis() > currentTime;
+    });
+  }, [allOffers, currentTime]);
 
   function formatPrice(price: number) {
     return price.toLocaleString("nb-NO", {
@@ -97,7 +151,27 @@ export default function OffersScreen() {
     });
   }
 
+  function formatExpirationDate(
+    expiration: Timestamp
+  ) {
+    return expiration.toDate().toLocaleDateString(
+      "nb-NO",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }
+    );
+  }
 
+  function openOfferDetails(offerId: string) {
+    router.push({
+      pathname: "/offer-details",
+      params: {
+        id: offerId,
+      },
+    });
+  }
 
   async function toggleLike(offer: Offer) {
     const currentUser = auth.currentUser;
@@ -107,6 +181,7 @@ export default function OffersScreen() {
         "Logg inn",
         "Du må være logget inn for å like et tilbud."
       );
+
       return;
     }
 
@@ -117,33 +192,58 @@ export default function OffersScreen() {
     try {
       setUpdatingLikeId(offer.id);
 
-      const offerReference = doc(db, "offers", offer.id);
+      const offerReference = doc(
+        db,
+        "offers",
+        offer.id
+      );
 
-      await runTransaction(db, async (transaction) => {
-        const snapshot = await transaction.get(offerReference);
+      await runTransaction(
+        db,
+        async (transaction) => {
+          const snapshot =
+            await transaction.get(offerReference);
 
-        if (!snapshot.exists()) {
-          throw new Error("Tilbudet finnes ikke.");
+          if (!snapshot.exists()) {
+            throw new Error(
+              "Tilbudet finnes ikke."
+            );
+          }
+
+          const data = snapshot.data();
+
+          const likedBy: string[] = Array.isArray(
+            data.likedBy
+          )
+            ? data.likedBy
+            : [];
+
+          const hasLiked = likedBy.includes(
+            currentUser.uid
+          );
+
+          const nextLikedBy = hasLiked
+            ? likedBy.filter(
+                (uid) => uid !== currentUser.uid
+              )
+            : [...likedBy, currentUser.uid];
+
+          transaction.update(offerReference, {
+            likedBy: nextLikedBy,
+            likeCount: nextLikedBy.length,
+          });
         }
-
-        const data = snapshot.data();
-        const likedBy: string[] = Array.isArray(data.likedBy)
-          ? data.likedBy
-          : [];
-
-        const hasLiked = likedBy.includes(currentUser.uid);
-        const nextLikedBy = hasLiked
-          ? likedBy.filter((uid) => uid !== currentUser.uid)
-          : [...likedBy, currentUser.uid];
-
-        transaction.update(offerReference, {
-          likedBy: nextLikedBy,
-          likeCount: nextLikedBy.length,
-        });
-      });
+      );
     } catch (error) {
-      console.error("Feil ved liking av tilbud:", error);
-      Alert.alert("Kunne ikke oppdatere", "Prøv igjen om litt.");
+      console.error(
+        "Feil ved liking av tilbud:",
+        error
+      );
+
+      Alert.alert(
+        "Kunne ikke oppdatere",
+        "Prøv igjen om litt."
+      );
     } finally {
       setUpdatingLikeId(null);
     }
@@ -163,24 +263,37 @@ export default function OffersScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <SafeAreaView
+        style={styles.safeArea}
+        edges={["top"]}
+      >
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#1F7A3D" />
-          <Text style={styles.loadingText}>Henter tilbud...</Text>
+          <ActivityIndicator
+            size="large"
+            color="#1F7A3D"
+          />
+
+          <Text style={styles.loadingText}>
+            Henter tilbud...
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top"]}
+    >
       <FlatList
         data={offers}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.container,
-          offers.length === 0 && styles.emptyListContainer,
+          offers.length === 0 &&
+            styles.emptyListContainer,
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -191,13 +304,18 @@ export default function OffersScreen() {
                 color="#1F7A3D"
               />
 
-              <Text style={styles.badgeText}>Ukens tilbud</Text>
+              <Text style={styles.badgeText}>
+                Ukens tilbud
+              </Text>
             </View>
 
-            <Text style={styles.title}>Gode tilbud</Text>
+            <Text style={styles.title}>
+              Gode tilbud
+            </Text>
 
             <Text style={styles.subtitle}>
-              Oppdag de nyeste tilbudene og spar penger på handleturen.
+              Oppdag de nyeste tilbudene og spar
+              penger på handleturen.
             </Text>
 
             {errorMessage ? (
@@ -208,7 +326,9 @@ export default function OffersScreen() {
                   color="#A52626"
                 />
 
-                <Text style={styles.errorText}>{errorMessage}</Text>
+                <Text style={styles.errorText}>
+                  {errorMessage}
+                </Text>
               </View>
             ) : null}
           </View>
@@ -221,18 +341,37 @@ export default function OffersScreen() {
               color="#8B968E"
             />
 
-            <Text style={styles.emptyTitle}>Ingen tilbud ennå</Text>
+            <Text style={styles.emptyTitle}>
+              Ingen aktive tilbud
+            </Text>
 
             <Text style={styles.emptyText}>
-              Aktive tilbud vil vises her når de publiseres av butikken.
+              Nye tilbud vil vises her når de
+              publiseres av butikken.
             </Text>
           </View>
         }
         renderItem={({ item }) => {
           const offerImage = getOfferImage(item);
 
+          const hasLiked =
+            auth.currentUser !== null &&
+            item.likedBy.includes(
+              auth.currentUser.uid
+            );
+
           return (
-            <View style={styles.card}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.card,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() =>
+                openOfferDetails(item.id)
+              }
+              accessibilityRole="button"
+              accessibilityLabel={`Åpne detaljer for ${item.title}`}
+            >
               <View style={styles.imageContainer}>
                 {offerImage ? (
                   <Image
@@ -241,14 +380,18 @@ export default function OffersScreen() {
                     resizeMode="cover"
                   />
                 ) : (
-                  <View style={styles.imagePlaceholder}>
+                  <View
+                    style={styles.imagePlaceholder}
+                  >
                     <Ionicons
                       name="basket-outline"
                       size={48}
                       color="#1F7A3D"
                     />
 
-                    <Text style={styles.noImageText}>Tilbudsbilde</Text>
+                    <Text style={styles.noImageText}>
+                      Tilbudsbilde
+                    </Text>
                   </View>
                 )}
 
@@ -261,30 +404,51 @@ export default function OffersScreen() {
                 <Pressable
                   style={({ pressed }) => [
                     styles.likeButton,
-                    pressed && styles.likeButtonPressed,
+                    pressed &&
+                      styles.likeButtonPressed,
                   ]}
-                  onPress={() => toggleLike(item)}
-                  disabled={updatingLikeId === item.id}
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    void toggleLike(item);
+                  }}
+                  disabled={
+                    updatingLikeId === item.id
+                  }
                 >
-                  <Ionicons
-                    name={
-                      auth.currentUser &&
-                      item.likedBy.includes(auth.currentUser.uid)
-                        ? "heart"
-                        : "heart-outline"
-                    }
-                    size={23}
-                    color="#D62828"
-                  />
+                  {updatingLikeId === item.id ? (
+                    <ActivityIndicator
+                      size="small"
+                      color="#D62828"
+                    />
+                  ) : (
+                    <>
+                      <Ionicons
+                        name={
+                          hasLiked
+                            ? "heart"
+                            : "heart-outline"
+                        }
+                        size={23}
+                        color="#D62828"
+                      />
 
-                  <Text style={styles.likeCount}>{item.likeCount}</Text>
+                      <Text style={styles.likeCount}>
+                        {item.likeCount}
+                      </Text>
+                    </>
+                  )}
                 </Pressable>
               </View>
 
               <View style={styles.cardContent}>
-                <Text style={styles.offerTitle}>{item.title}</Text>
+                <Text style={styles.offerTitle}>
+                  {item.title}
+                </Text>
 
-                <Text style={styles.description}>
+                <Text
+                  style={styles.description}
+                  numberOfLines={3}
+                >
                   {item.description}
                 </Text>
 
@@ -309,8 +473,39 @@ export default function OffersScreen() {
                     {item.duration}
                   </Text>
                 </View>
+
+                {item.expiresAt ? (
+                  <View style={styles.expirationRow}>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={17}
+                      color="#8A5A00"
+                    />
+
+                    <Text
+                      style={styles.expirationText}
+                    >
+                      Utløper{" "}
+                      {formatExpirationDate(
+                        item.expiresAt
+                      )}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <View style={styles.detailsRow}>
+                  <Text style={styles.detailsText}>
+                    Se detaljer
+                  </Text>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color="#1F7A3D"
+                  />
+                </View>
               </View>
-            </View>
+            </Pressable>
           );
         }}
       />
@@ -378,6 +573,11 @@ const styles = StyleSheet.create({
     borderColor: "#E1E5E2",
   },
 
+  cardPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.99 }],
+  },
+
   imageContainer: {
     height: 190,
     position: "relative",
@@ -420,8 +620,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "900",
   },
-
-
 
   likeButton: {
     position: "absolute",
@@ -469,6 +667,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: 10,
   },
 
@@ -499,6 +698,39 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: "#666666",
+  },
+
+  expirationRow: {
+    marginTop: 10,
+    padding: 11,
+    borderRadius: 11,
+    backgroundColor: "#FFF5DF",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+
+  expirationText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "800",
+    color: "#8A5A00",
+  },
+
+  detailsRow: {
+    marginTop: 15,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: "#EEEEEE",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  detailsText: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#1F7A3D",
   },
 
   centerContainer: {

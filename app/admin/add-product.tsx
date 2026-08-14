@@ -1,8 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore";
 import { useState } from "react";
 import {
   Alert,
@@ -18,18 +26,58 @@ import {
 } from "react-native";
 
 import { db } from "../../firebase/firebaseConfig";
+import {
+  sendNewContentPushNotification,
+} from "../../services/pushNotifications";
 
 const MAX_IMAGE_LENGTH = 750000;
 
+function getStartOfToday() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return today;
+}
+
+function getEndOfDay(date: Date) {
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  return endOfDay;
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString("nb-NO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 export default function AddProductScreen() {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] =
+    useState("");
+
   const [price, setPrice] = useState("");
 
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [expirationDate, setExpirationDate] =
+    useState<Date | null>(null);
 
-  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const [showDatePicker, setShowDatePicker] =
+    useState(false);
+
+  const [imageUri, setImageUri] = useState<
+    string | null
+  >(null);
+
+  const [imageBase64, setImageBase64] = useState<
+    string | null
+  >(null);
+
+  const [isProcessingImage, setIsProcessingImage] =
+    useState(false);
+
   const [isSaving, setIsSaving] = useState(false);
 
   async function pickImage() {
@@ -42,15 +90,17 @@ export default function AddProductScreen() {
           "Tillatelse mangler",
           "Du må gi appen tilgang til bildene dine for å velge et produktbilde."
         );
+
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
+      const result =
+        await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ["images"],
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 0.8,
+        });
 
       if (result.canceled) {
         return;
@@ -60,27 +110,31 @@ export default function AddProductScreen() {
 
       setIsProcessingImage(true);
 
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        selectedImageUri,
-        [
-          {
-            resize: {
-              width: 700,
+      const manipulatedImage =
+        await ImageManipulator.manipulateAsync(
+          selectedImageUri,
+          [
+            {
+              resize: {
+                width: 700,
+              },
             },
-          },
-        ],
-        {
-          compress: 0.45,
-          format: ImageManipulator.SaveFormat.JPEG,
-          base64: true,
-        }
-      );
+          ],
+          {
+            compress: 0.45,
+            format: ImageManipulator.SaveFormat.JPEG,
+            base64: true,
+          }
+        );
 
       if (!manipulatedImage.base64) {
-        throw new Error("Bildet kunne ikke konverteres til Base64.");
+        throw new Error(
+          "Bildet kunne ikke konverteres til Base64."
+        );
       }
 
-      const imageDataUrl = `data:image/jpeg;base64,${manipulatedImage.base64}`;
+      const imageDataUrl =
+        `data:image/jpeg;base64,${manipulatedImage.base64}`;
 
       if (imageDataUrl.length > MAX_IMAGE_LENGTH) {
         Alert.alert(
@@ -90,13 +144,17 @@ export default function AddProductScreen() {
 
         setImageUri(null);
         setImageBase64(null);
+
         return;
       }
 
       setImageUri(manipulatedImage.uri);
       setImageBase64(imageDataUrl);
     } catch (error) {
-      console.error("Feil ved behandling av bilde:", error);
+      console.error(
+        "Feil ved behandling av bilde:",
+        error
+      );
 
       Alert.alert(
         "Kunne ikke behandle bildet",
@@ -110,19 +168,47 @@ export default function AddProductScreen() {
     }
   }
 
+  function handleDateChange(
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) {
+    setShowDatePicker(false);
+
+    if (event.type === "dismissed" || !selectedDate) {
+      return;
+    }
+
+    setExpirationDate(selectedDate);
+  }
+
+  function convertPriceToNumber(value: string) {
+    return Number(
+      value
+        .trim()
+        .replace(/\s/g, "")
+        .replace(",", ".")
+    );
+  }
+
   function validateForm() {
-    const parsedPrice = Number(price.replace(",", "."));
+    const parsedPrice =
+      convertPriceToNumber(price);
 
     if (!imageBase64) {
       Alert.alert(
         "Manglende produktbilde",
         "Velg et bilde før du publiserer produktet."
       );
+
       return false;
     }
 
     if (!name.trim()) {
-      Alert.alert("Manglende navn", "Skriv inn navnet på produktet.");
+      Alert.alert(
+        "Manglende navn",
+        "Skriv inn navnet på produktet."
+      );
+
       return false;
     }
 
@@ -131,11 +217,38 @@ export default function AddProductScreen() {
         "Manglende beskrivelse",
         "Skriv inn en kort beskrivelse av produktet."
       );
+
       return false;
     }
 
-    if (!price || Number.isNaN(parsedPrice) || parsedPrice <= 0) {
-      Alert.alert("Ugyldig pris", "Skriv inn en gyldig produktpris.");
+    if (
+      !price.trim() ||
+      Number.isNaN(parsedPrice) ||
+      parsedPrice <= 0
+    ) {
+      Alert.alert(
+        "Ugyldig pris",
+        "Skriv inn en gyldig produktpris."
+      );
+
+      return false;
+    }
+
+    if (!expirationDate) {
+      Alert.alert(
+        "Manglende utløpsdato",
+        "Velg datoen produktet skal forsvinne fra appen."
+      );
+
+      return false;
+    }
+
+    if (getEndOfDay(expirationDate).getTime() <= Date.now()) {
+      Alert.alert(
+        "Utløpsdatoen er passert",
+        "Velg dagens dato eller en senere dato."
+      );
+
       return false;
     }
 
@@ -143,16 +256,24 @@ export default function AddProductScreen() {
   }
 
   async function saveProduct() {
-    if (!validateForm() || isSaving || isProcessingImage) {
+    if (
+      !validateForm() ||
+      isSaving ||
+      isProcessingImage ||
+      !expirationDate
+    ) {
       return;
     }
 
     try {
       setIsSaving(true);
 
-      const parsedPrice = Number(price.replace(",", "."));
+      const parsedPrice =
+        convertPriceToNumber(price);
 
-      await addDoc(collection(db, "products"), {
+      const productDocument = await addDoc(
+        collection(db, "products"),
+        {
         name: name.trim(),
         description: description.trim(),
         price: parsedPrice,
@@ -163,12 +284,48 @@ export default function AddProductScreen() {
         isActive: true,
         likeCount: 0,
         likedBy: [],
-        createdAt: serverTimestamp(),
-      });
+        openCount: 0,
+
+        expiresAt: Timestamp.fromDate(
+          getEndOfDay(expirationDate)
+        ),
+
+          createdAt: serverTimestamp(),
+        }
+      );
+
+      let successMessage =
+        "Produktet ble lagret og vil automatisk forsvinne etter utløpsdatoen.";
+
+      try {
+        const pushResult =
+          await sendNewContentPushNotification({
+            type: "product",
+            itemId: productDocument.id,
+            contentName: name.trim(),
+          });
+
+        if (pushResult.sent > 0) {
+          successMessage += ` Push-varsel sendt til ${pushResult.sent} bruker${
+            pushResult.sent === 1 ? "" : "e"
+          }.`;
+        } else {
+          successMessage +=
+            " Ingen brukere med aktive push-varsler ble funnet.";
+        }
+      } catch (notificationError) {
+        console.error(
+          "Produktet ble publisert, men push-varselet feilet:",
+          notificationError
+        );
+
+        successMessage +=
+          " Produktet er publisert, men push-varselet kunne ikke sendes.";
+      }
 
       Alert.alert(
         "Produkt publisert",
-        "Produktet og bildet ble lagret.",
+        successMessage,
         [
           {
             text: "OK",
@@ -177,11 +334,14 @@ export default function AddProductScreen() {
         ]
       );
     } catch (error) {
-      console.error("Feil ved lagring av produkt:", error);
+      console.error(
+        "Feil ved lagring av produkt:",
+        error
+      );
 
       Alert.alert(
         "Kunne ikke publisere",
-        "Det oppstod en feil under lagringen. Bildet kan være for stort. Se terminalen for mer informasjon."
+        "Det oppstod en feil under lagringen. Se terminalen for mer informasjon."
       );
     } finally {
       setIsSaving(false);
@@ -196,6 +356,8 @@ export default function AddProductScreen() {
     setName("");
     setDescription("");
     setPrice("");
+    setExpirationDate(null);
+    setShowDatePicker(false);
     setImageUri(null);
     setImageBase64(null);
   }
@@ -205,7 +367,9 @@ export default function AddProductScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={
+        Platform.OS === "ios" ? "padding" : undefined
+      }
       keyboardVerticalOffset={90}
     >
       <ScrollView
@@ -213,7 +377,6 @@ export default function AddProductScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-
         <Pressable
           style={({ pressed }) => [
             styles.adminBackButton,
@@ -221,7 +384,12 @@ export default function AddProductScreen() {
           ]}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back-outline" size={21} color="#202020" />
+          <Ionicons
+            name="arrow-back-outline"
+            size={21}
+            color="#202020"
+          />
+
           <Text style={styles.adminBackButtonText}>
             Tilbake til administrasjon
           </Text>
@@ -230,7 +398,8 @@ export default function AddProductScreen() {
         <Text style={styles.title}>Nytt produkt</Text>
 
         <Text style={styles.subtitle}>
-          Legg inn informasjon og produktbilde som skal vises i butikken.
+          Legg inn et produkt som automatisk
+          forsvinner fra siden etter utløpsdatoen.
         </Text>
 
         <Text style={styles.label}>Produktbilde</Text>
@@ -238,7 +407,9 @@ export default function AddProductScreen() {
         <Pressable
           style={({ pressed }) => [
             styles.imagePicker,
-            pressed && !isBusy && styles.buttonPressed,
+            pressed &&
+              !isBusy &&
+              styles.buttonPressed,
             isBusy && styles.disabledButton,
           ]}
           onPress={pickImage}
@@ -274,16 +445,19 @@ export default function AddProductScreen() {
                 color="#1F7A3D"
               />
 
-              <Text style={styles.imagePickerTitle}>Velg bilde</Text>
+              <Text style={styles.imagePickerTitle}>
+                Velg bilde
+              </Text>
 
               <Text style={styles.imagePickerText}>
-                Bildet komprimeres og lagres sammen med produktet
+                Bildet komprimeres og lagres sammen
+                med produktet
               </Text>
             </View>
           )}
         </Pressable>
 
-        {imageUri && !isProcessingImage && (
+        {imageUri && !isProcessingImage ? (
           <View style={styles.imageActions}>
             <Pressable
               style={styles.changeImageButton}
@@ -296,7 +470,9 @@ export default function AddProductScreen() {
                 color="#1F7A3D"
               />
 
-              <Text style={styles.changeImageText}>Bytt bilde</Text>
+              <Text style={styles.changeImageText}>
+                Bytt bilde
+              </Text>
             </Pressable>
 
             <Pressable
@@ -313,10 +489,12 @@ export default function AddProductScreen() {
                 color="#B42318"
               />
 
-              <Text style={styles.removeImageText}>Fjern bilde</Text>
+              <Text style={styles.removeImageText}>
+                Fjern bilde
+              </Text>
             </Pressable>
           </View>
-        )}
+        ) : null}
 
         <View style={styles.infoBox}>
           <Ionicons
@@ -326,8 +504,8 @@ export default function AddProductScreen() {
           />
 
           <Text style={styles.infoText}>
-            Bildet blir komprimert og lagret direkte i Firestore sammen med
-            produktet.
+            Bildet blir komprimert og lagret direkte
+            i Firestore sammen med produktet.
           </Text>
         </View>
 
@@ -373,13 +551,89 @@ export default function AddProductScreen() {
           editable={!isBusy}
         />
 
+        <Text style={styles.label}>
+          Automatisk utløpsdato
+        </Text>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.dateButton,
+            pressed && styles.dateButtonPressed,
+            isBusy && styles.disabledButton,
+          ]}
+          onPress={() => setShowDatePicker(true)}
+          disabled={isBusy}
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={22}
+            color="#1F7A3D"
+          />
+
+          <View style={styles.dateButtonContent}>
+            <Text style={styles.dateButtonLabel}>
+              {expirationDate
+                ? "Valgt utløpsdato"
+                : "Velg utløpsdato"}
+            </Text>
+
+            <Text
+              style={[
+                styles.dateButtonValue,
+                !expirationDate &&
+                  styles.datePlaceholder,
+              ]}
+            >
+              {expirationDate
+                ? formatDate(expirationDate)
+                : "Trykk for å åpne kalenderen"}
+            </Text>
+          </View>
+
+          <Ionicons
+            name="chevron-forward-outline"
+            size={21}
+            color="#777777"
+          />
+        </Pressable>
+
+        {showDatePicker ? (
+          <View style={styles.datePickerContainer}>
+            <DateTimePicker
+              value={expirationDate ?? getStartOfToday()}
+              mode="date"
+              display={Platform.OS === "ios" ? "inline" : "calendar"}
+              minimumDate={getStartOfToday()}
+              onChange={handleDateChange}
+              themeVariant="light"
+              accentColor="#1F7A3D"
+            />
+          </View>
+        ) : null}
+
+        <View style={styles.expirationInformationBox}>
+          <Ionicons
+            name="time-outline"
+            size={22}
+            color="#8A5A00"
+          />
+
+          <Text style={styles.expirationInformationText}>
+            Produktet er synlig til kl. 23:59 på den
+            valgte datoen. Deretter forsvinner det
+            automatisk fra kundesiden.
+          </Text>
+        </View>
+
         <Pressable
           style={({ pressed }) => [
             styles.saveButton,
-            pressed && !isBusy && styles.buttonPressed,
+            pressed &&
+              !isBusy &&
+              styles.buttonPressed,
             isBusy && styles.disabledButton,
           ]}
-          onPress={saveProduct}
+          onPress={() => void saveProduct()}
           disabled={isBusy}
         >
           <Ionicons
@@ -406,13 +660,17 @@ export default function AddProductScreen() {
         <Pressable
           style={({ pressed }) => [
             styles.resetButton,
-            pressed && !isBusy && styles.buttonPressed,
+            pressed &&
+              !isBusy &&
+              styles.buttonPressed,
             isBusy && styles.disabledButton,
           ]}
           onPress={resetForm}
           disabled={isBusy}
         >
-          <Text style={styles.resetButtonText}>Tøm skjemaet</Text>
+          <Text style={styles.resetButtonText}>
+            Tøm skjemaet
+          </Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -561,6 +819,72 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 
+  dateButton: {
+    minHeight: 72,
+    paddingHorizontal: 15,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: "#D8DDD9",
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  dateButtonPressed: {
+    backgroundColor: "#F1F7F2",
+  },
+
+  dateButtonContent: {
+    flex: 1,
+  },
+
+  dateButtonLabel: {
+    fontSize: 12,
+    color: "#777777",
+  },
+
+  dateButtonValue: {
+    marginTop: 4,
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#202020",
+  },
+
+  datePlaceholder: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#999999",
+  },
+
+  datePickerContainer: {
+    marginTop: 12,
+    minHeight: 355,
+    overflow: "hidden",
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D8DDD9",
+    justifyContent: "center",
+  },
+
+  expirationInformationBox: {
+    marginTop: 12,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: "#FFF5DF",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+
+  expirationInformationText: {
+    flex: 1,
+    color: "#745321",
+    fontSize: 13,
+    lineHeight: 19,
+  },
+
   saveButton: {
     marginTop: 28,
     minHeight: 56,
@@ -593,7 +917,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
   },
-
 
   adminBackButton: {
     alignSelf: "flex-start",

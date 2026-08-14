@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/send-push.ts": {
+      "maxDuration": 10
+    }
+  }
+}

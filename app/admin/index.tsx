@@ -1,14 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import {
-  addDoc,
-  collection,
-  onSnapshot,
-  serverTimestamp,
-} from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
-import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -18,51 +12,34 @@ import {
 
 import { db } from "../../firebase/firebaseConfig";
 
-type LikeItem = {
-  id: string;
-  title: string;
-  likeCount: number;
-  type: "Tilbud" | "Produkt";
-};
-
 export default function AdminScreen() {
-  const [offerLikes, setOfferLikes] = useState<LikeItem[]>([]);
-  const [productLikes, setProductLikes] = useState<LikeItem[]>([]);
+  const [offerLikes, setOfferLikes] = useState(0);
+  const [productLikes, setProductLikes] = useState(0);
 
   useEffect(() => {
     const unsubscribeOffers = onSnapshot(
       collection(db, "offers"),
       (snapshot) => {
-        setOfferLikes(
-          snapshot.docs.map((document) => {
-            const data = document.data();
-
-            return {
-              id: document.id,
-              title: data.title ?? "Uten navn",
-              likeCount: data.likeCount ?? 0,
-              type: "Tilbud",
-            };
-          })
+        const total = snapshot.docs.reduce(
+          (sum, document) =>
+            sum + Number(document.data().likeCount ?? 0),
+          0
         );
+
+        setOfferLikes(total);
       }
     );
 
     const unsubscribeProducts = onSnapshot(
       collection(db, "products"),
       (snapshot) => {
-        setProductLikes(
-          snapshot.docs.map((document) => {
-            const data = document.data();
-
-            return {
-              id: document.id,
-              title: data.name ?? "Uten navn",
-              likeCount: data.likeCount ?? 0,
-              type: "Produkt",
-            };
-          })
+        const total = snapshot.docs.reduce(
+          (sum, document) =>
+            sum + Number(document.data().likeCount ?? 0),
+          0
         );
+
+        setProductLikes(total);
       }
     );
 
@@ -72,43 +49,7 @@ export default function AdminScreen() {
     };
   }, []);
 
-  const popularityItems = useMemo(
-    () =>
-      [...offerLikes, ...productLikes]
-        .sort((first, second) => second.likeCount - first.likeCount)
-        .slice(0, 10),
-    [offerLikes, productLikes]
-  );
-
-  const totalLikes = useMemo(
-    () =>
-      [...offerLikes, ...productLikes].reduce(
-        (sum, item) => sum + item.likeCount,
-        0
-      ),
-    [offerLikes, productLikes]
-  );
-
-  async function testFirebase() {
-    try {
-      await addDoc(collection(db, "firebaseTests"), {
-        message: "Firebase fungerer",
-        createdAt: serverTimestamp(),
-      });
-
-      Alert.alert(
-        "Firebase fungerer",
-        "Testdata ble lagret ."
-      );
-    } catch (error) {
-      console.error("Firebase-feil:", error);
-
-      Alert.alert(
-        "Firebase-feil",
-        "Kunne ikke lagre testdata. Se terminalen for feilmeldingen."
-      );
-    }
-  }
+  const totalLikes = offerLikes + productLikes;
 
   return (
     <ScrollView
@@ -148,11 +89,9 @@ export default function AdminScreen() {
         <Text style={styles.title}>Administrasjon</Text>
 
         <Text style={styles.subtitle}>
-          Administrer tilbud og nye produkter i appen.
+          Administrer tilbud, produkter og statistikk i appen.
         </Text>
       </View>
-
-      
 
       <Text style={styles.sectionTitle}>Opprett innhold</Text>
 
@@ -216,7 +155,9 @@ export default function AdminScreen() {
         />
       </Pressable>
 
-      <Text style={styles.sectionTitle}>Administrer innhold</Text>
+      <Text style={styles.sectionTitle}>
+        Administrer innhold
+      </Text>
 
       <Pressable
         style={({ pressed }) => [
@@ -234,7 +175,9 @@ export default function AdminScreen() {
         </View>
 
         <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>Administrer tilbud</Text>
+          <Text style={styles.cardTitle}>
+            Administrer tilbud
+          </Text>
 
           <Text style={styles.cardDescription}>
             Se, skjul, aktiver og slett publiserte tilbud.
@@ -255,7 +198,9 @@ export default function AdminScreen() {
         ]}
         onPress={() => router.push("/admin/manage-products")}
       >
-        <View style={[styles.iconBox, styles.manageProductIconBox]}>
+        <View
+          style={[styles.iconBox, styles.manageProductIconBox]}
+        >
           <Ionicons
             name="settings-outline"
             size={28}
@@ -264,7 +209,9 @@ export default function AdminScreen() {
         </View>
 
         <View style={styles.cardContent}>
-          <Text style={styles.cardTitle}>Administrer produkter</Text>
+          <Text style={styles.cardTitle}>
+            Administrer produkter
+          </Text>
 
           <Text style={styles.cardDescription}>
             Se, skjul, aktiver og slett publiserte produkter.
@@ -285,6 +232,36 @@ export default function AdminScreen() {
           styles.card,
           pressed && styles.cardPressed,
         ]}
+        onPress={() => router.push("/admin/analytics")}
+      >
+        <View style={[styles.iconBox, styles.analyticsIconBox]}>
+          <Ionicons
+            name="analytics-outline"
+            size={28}
+            color="#0B6E75"
+          />
+        </View>
+
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle}>Analytics</Text>
+
+          <Text style={styles.cardDescription}>
+            Se åpninger, populære produkter og aktive brukere.
+          </Text>
+        </View>
+
+        <Ionicons
+          name="chevron-forward"
+          size={23}
+          color="#777777"
+        />
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.card,
+          pressed && styles.cardPressed,
+        ]}
         onPress={() => router.push("/admin/likes")}
       >
         <View style={[styles.iconBox, styles.likesIconBox]}>
@@ -299,7 +276,8 @@ export default function AdminScreen() {
           <Text style={styles.cardTitle}>Likes</Text>
 
           <Text style={styles.cardDescription}>
-            Se hvilke tilbud og produkter som har fått flest likes.
+            Se hvilke tilbud og produkter som har fått flest
+            likes.
           </Text>
         </View>
 
@@ -314,7 +292,6 @@ export default function AdminScreen() {
           color="#777777"
         />
       </Pressable>
-
     </ScrollView>
   );
 }
@@ -386,130 +363,6 @@ const styles = StyleSheet.create({
     color: "#666666",
   },
 
-  testButton: {
-    minHeight: 54,
-    marginBottom: 28,
-    borderRadius: 13,
-    backgroundColor: "#222222",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 9,
-  },
-
-  testButtonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "800",
-  },
-
-
-
-  likesOverview: {
-    marginBottom: 28,
-    padding: 17,
-    borderRadius: 17,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E2E5E2",
-  },
-
-  likesOverviewHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-
-  likesOverviewIcon: {
-    width: 48,
-    height: 48,
-    marginRight: 12,
-    borderRadius: 14,
-    backgroundColor: "#FDE8E8",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  likesOverviewText: {
-    flex: 1,
-  },
-
-  likesOverviewTitle: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: "#202020",
-  },
-
-  likesOverviewSubtitle: {
-    marginTop: 3,
-    fontSize: 13,
-    color: "#707070",
-  },
-
-  noLikesText: {
-    paddingVertical: 14,
-    textAlign: "center",
-    color: "#777777",
-    fontSize: 14,
-  },
-
-  likeRow: {
-    minHeight: 58,
-    flexDirection: "row",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#EFEFEF",
-  },
-
-  rankCircle: {
-    width: 30,
-    height: 30,
-    marginRight: 10,
-    borderRadius: 15,
-    backgroundColor: "#F3F4F3",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  rankText: {
-    fontSize: 12,
-    fontWeight: "900",
-    color: "#555555",
-  },
-
-  likeItemContent: {
-    flex: 1,
-    paddingRight: 10,
-  },
-
-  likeItemTitle: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: "#242424",
-  },
-
-  likeItemType: {
-    marginTop: 2,
-    fontSize: 12,
-    color: "#7A7A7A",
-  },
-
-  likeCountBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 999,
-    backgroundColor: "#FDECEC",
-  },
-
-  likeCountText: {
-    fontSize: 14,
-    fontWeight: "900",
-    color: "#D62828",
-  },
-
   sectionTitle: {
     marginBottom: 12,
     fontSize: 17,
@@ -559,6 +412,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0E8FA",
   },
 
+  analyticsIconBox: {
+    backgroundColor: "#DDF1F2",
+  },
+
+  likesIconBox: {
+    backgroundColor: "#FBE7E7",
+  },
+
   cardContent: {
     flex: 1,
     paddingRight: 10,
@@ -575,11 +436,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: "#707070",
-  },
-
-
-  likesIconBox: {
-    backgroundColor: "#FBE7E7",
   },
 
   likesCountBadge: {

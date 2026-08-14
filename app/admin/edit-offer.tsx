@@ -1,9 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import {
+  router,
+  useLocalSearchParams,
+} from "expo-router";
 import {
   doc,
   getDoc,
   serverTimestamp,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -22,6 +29,50 @@ import {
 
 import { db } from "../../firebase/firebaseConfig";
 
+function getStartOfToday() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return today;
+}
+
+function getEndOfDay(date: Date) {
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  return endOfDay;
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString("nb-NO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function getTimestampDate(value: unknown) {
+  if (value instanceof Timestamp) {
+    return value.toDate();
+  }
+
+  if (
+    value &&
+    typeof value === "object" &&
+    "toDate" in value &&
+    typeof (value as { toDate?: unknown }).toDate ===
+      "function"
+  ) {
+    return (
+      value as {
+        toDate: () => Date;
+      }
+    ).toDate();
+  }
+
+  return null;
+}
+
 export default function EditOfferScreen() {
   const parameters = useLocalSearchParams();
 
@@ -30,10 +81,20 @@ export default function EditOfferScreen() {
     : parameters.id;
 
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] =
+    useState("");
+
   const [oldPrice, setOldPrice] = useState("");
-  const [offerPrice, setOfferPrice] = useState("");
+  const [offerPrice, setOfferPrice] =
+    useState("");
+
   const [duration, setDuration] = useState("");
+
+  const [expirationDate, setExpirationDate] =
+    useState<Date | null>(null);
+
+  const [showDatePicker, setShowDatePicker] =
+    useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -49,7 +110,10 @@ export default function EditOfferScreen() {
           [
             {
               text: "Gå tilbake",
-              onPress: () => router.replace("/admin/manage-offers"),
+              onPress: () =>
+                router.replace(
+                  "/admin/manage-offers"
+                ),
             },
           ]
         );
@@ -58,8 +122,14 @@ export default function EditOfferScreen() {
       }
 
       try {
-        const offerReference = doc(db, "offers", offerId);
-        const offerSnapshot = await getDoc(offerReference);
+        const offerReference = doc(
+          db,
+          "offers",
+          offerId
+        );
+
+        const offerSnapshot =
+          await getDoc(offerReference);
 
         if (!offerSnapshot.exists()) {
           Alert.alert(
@@ -68,7 +138,10 @@ export default function EditOfferScreen() {
             [
               {
                 text: "Gå tilbake",
-                onPress: () => router.replace("/admin/manage-offers"),
+                onPress: () =>
+                  router.replace(
+                    "/admin/manage-offers"
+                  ),
               },
             ]
           );
@@ -79,7 +152,9 @@ export default function EditOfferScreen() {
         const offerData = offerSnapshot.data();
 
         setTitle(offerData.title ?? "");
-        setDescription(offerData.description ?? "");
+        setDescription(
+          offerData.description ?? ""
+        );
 
         setOldPrice(
           offerData.oldPrice !== undefined
@@ -94,8 +169,15 @@ export default function EditOfferScreen() {
         );
 
         setDuration(offerData.duration ?? "");
+
+        setExpirationDate(
+          getTimestampDate(offerData.expiresAt)
+        );
       } catch (error) {
-        console.error("Feil ved henting av tilbud:", error);
+        console.error(
+          "Feil ved henting av tilbud:",
+          error
+        );
 
         Alert.alert(
           "Kunne ikke hente tilbudet",
@@ -106,8 +188,21 @@ export default function EditOfferScreen() {
       }
     }
 
-    loadOffer();
+    void loadOffer();
   }, [offerId]);
+
+  function handleDateChange(
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) {
+    setShowDatePicker(false);
+
+    if (event.type === "dismissed" || !selectedDate) {
+      return;
+    }
+
+    setExpirationDate(selectedDate);
+  }
 
   function convertPriceToNumber(value: string) {
     const normalizedValue = value
@@ -122,23 +217,33 @@ export default function EditOfferScreen() {
     originalPrice: number,
     discountedPrice: number
   ) {
-    if (originalPrice <= 0 || discountedPrice >= originalPrice) {
+    if (
+      originalPrice <= 0 ||
+      discountedPrice >= originalPrice
+    ) {
       return 0;
     }
 
     const discount =
-      ((originalPrice - discountedPrice) / originalPrice) * 100;
+      ((originalPrice - discountedPrice) /
+        originalPrice) *
+      100;
 
     return Math.round(discount);
   }
 
   async function saveOfferChanges() {
     const trimmedTitle = title.trim();
-    const trimmedDescription = description.trim();
+    const trimmedDescription =
+      description.trim();
+
     const trimmedDuration = duration.trim();
 
-    const numericOldPrice = convertPriceToNumber(oldPrice);
-    const numericOfferPrice = convertPriceToNumber(offerPrice);
+    const numericOldPrice =
+      convertPriceToNumber(oldPrice);
+
+    const numericOfferPrice =
+      convertPriceToNumber(offerPrice);
 
     if (!offerId) {
       Alert.alert(
@@ -167,43 +272,27 @@ export default function EditOfferScreen() {
       return;
     }
 
-    if (!oldPrice.trim()) {
-      Alert.alert(
-        "Originalpris mangler",
-        "Skriv inn den opprinnelige prisen."
-      );
-
-      return;
-    }
-
     if (
+      !oldPrice.trim() ||
       Number.isNaN(numericOldPrice) ||
       numericOldPrice <= 0
     ) {
       Alert.alert(
         "Ugyldig originalpris",
-        "Skriv inn en gyldig originalpris, for eksempel 49,90."
-      );
-
-      return;
-    }
-
-    if (!offerPrice.trim()) {
-      Alert.alert(
-        "Tilbudspris mangler",
-        "Skriv inn tilbudsprisen."
+        "Skriv inn en gyldig originalpris."
       );
 
       return;
     }
 
     if (
+      !offerPrice.trim() ||
       Number.isNaN(numericOfferPrice) ||
       numericOfferPrice < 0
     ) {
       Alert.alert(
         "Ugyldig tilbudspris",
-        "Skriv inn en gyldig tilbudspris, for eksempel 29,90."
+        "Skriv inn en gyldig tilbudspris."
       );
 
       return;
@@ -227,15 +316,38 @@ export default function EditOfferScreen() {
       return;
     }
 
-    const discountPercentage = calculateDiscountPercentage(
-      numericOldPrice,
-      numericOfferPrice
-    );
+    if (!expirationDate) {
+      Alert.alert(
+        "Utløpsdato mangler",
+        "Velg datoen tilbudet skal forsvinne fra appen."
+      );
+
+      return;
+    }
+
+    if (getEndOfDay(expirationDate).getTime() <= Date.now()) {
+      Alert.alert(
+        "Utløpsdatoen er passert",
+        "Velg dagens dato eller en senere dato."
+      );
+
+      return;
+    }
+
+    const discountPercentage =
+      calculateDiscountPercentage(
+        numericOldPrice,
+        numericOfferPrice
+      );
 
     try {
       setIsSaving(true);
 
-      const offerReference = doc(db, "offers", offerId);
+      const offerReference = doc(
+        db,
+        "offers",
+        offerId
+      );
 
       await updateDoc(offerReference, {
         title: trimmedTitle,
@@ -244,21 +356,32 @@ export default function EditOfferScreen() {
         offerPrice: numericOfferPrice,
         discountPercentage,
         duration: trimmedDuration,
+
+        expiresAt: Timestamp.fromDate(
+          getEndOfDay(expirationDate)
+        ),
+
         updatedAt: serverTimestamp(),
       });
 
       Alert.alert(
         "Tilbud oppdatert",
-        "Endringene ble lagret.",
+        "Endringene og utløpsdatoen ble lagret.",
         [
           {
             text: "Ferdig",
-            onPress: () => router.replace("/admin/manage-offers"),
+            onPress: () =>
+              router.replace(
+                "/admin/manage-offers"
+              ),
           },
         ]
       );
     } catch (error) {
-      console.error("Feil ved oppdatering av tilbud:", error);
+      console.error(
+        "Feil ved oppdatering av tilbud:",
+        error
+      );
 
       Alert.alert(
         "Kunne ikke lagre",
@@ -272,7 +395,10 @@ export default function EditOfferScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1F7A3D" />
+        <ActivityIndicator
+          size="large"
+          color="#1F7A3D"
+        />
 
         <Text style={styles.loadingText}>
           Henter tilbud...
@@ -281,10 +407,19 @@ export default function EditOfferScreen() {
     );
   }
 
+  const pickerValue =
+    expirationDate &&
+    expirationDate.getTime() >=
+      getStartOfToday().getTime()
+      ? expirationDate
+      : getStartOfToday();
+
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={
+        Platform.OS === "ios" ? "padding" : undefined
+      }
     >
       <ScrollView
         contentContainerStyle={styles.container}
@@ -309,7 +444,8 @@ export default function EditOfferScreen() {
           </Text>
 
           <Text style={styles.subtitle}>
-            Endringene vises automatisk på tilbudssiden etter lagring.
+            Endringene vises automatisk på
+            tilbudssiden etter lagring.
           </Text>
         </View>
 
@@ -335,7 +471,10 @@ export default function EditOfferScreen() {
             </Text>
 
             <TextInput
-              style={[styles.input, styles.descriptionInput]}
+              style={[
+                styles.input,
+                styles.descriptionInput,
+              ]}
               value={description}
               onChangeText={setDescription}
               placeholder="Skriv en kort beskrivelse av tilbudet"
@@ -352,7 +491,9 @@ export default function EditOfferScreen() {
                 Originalpris
               </Text>
 
-              <View style={styles.priceInputContainer}>
+              <View
+                style={styles.priceInputContainer}
+              >
                 <TextInput
                   style={styles.priceInput}
                   value={oldPrice}
@@ -374,7 +515,9 @@ export default function EditOfferScreen() {
                 Tilbudspris
               </Text>
 
-              <View style={styles.priceInputContainer}>
+              <View
+                style={styles.priceInputContainer}
+              >
                 <TextInput
                   style={styles.priceInput}
                   value={offerPrice}
@@ -407,6 +550,78 @@ export default function EditOfferScreen() {
             />
           </View>
 
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>
+              Automatisk utløpsdato
+            </Text>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.dateButton,
+                pressed &&
+                  styles.dateButtonPressed,
+                isSaving &&
+                  styles.disabledButton,
+              ]}
+              onPress={() =>
+                setShowDatePicker(true)
+              }
+              disabled={isSaving}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={22}
+                color="#8A5A00"
+              />
+
+              <View
+                style={styles.dateButtonContent}
+              >
+                <Text
+                  style={styles.dateButtonLabel}
+                >
+                  {expirationDate
+                    ? "Valgt utløpsdato"
+                    : "Velg utløpsdato"}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.dateButtonValue,
+                    !expirationDate &&
+                      styles.datePlaceholder,
+                  ]}
+                >
+                  {expirationDate
+                    ? formatDate(expirationDate)
+                    : "Trykk for å åpne kalenderen"}
+                </Text>
+              </View>
+
+              <Ionicons
+                name="chevron-forward-outline"
+                size={21}
+                color="#777777"
+              />
+            </Pressable>
+
+            {showDatePicker ? (
+              <View
+                style={styles.datePickerContainer}
+              >
+                <DateTimePicker
+                  value={pickerValue}
+                  mode="date"
+                  display={Platform.OS === "ios" ? "inline" : "calendar"}
+                  minimumDate={getStartOfToday()}
+                  onChange={handleDateChange}
+                  themeVariant="light"
+                  accentColor="#1F7A3D"
+                />
+              </View>
+            ) : null}
+          </View>
+
           <View style={styles.informationBox}>
             <Ionicons
               name="information-circle-outline"
@@ -415,8 +630,9 @@ export default function EditOfferScreen() {
             />
 
             <Text style={styles.informationText}>
-              Rabattprosenten beregnes automatisk fra originalprisen og
-              tilbudsprisen.
+              Rabattprosenten beregnes automatisk.
+              Tilbudet forsvinner fra kundesiden
+              etter kl. 23:59 på utløpsdatoen.
             </Text>
           </View>
 
@@ -426,7 +642,9 @@ export default function EditOfferScreen() {
               pressed && styles.buttonPressed,
               isSaving && styles.disabledButton,
             ]}
-            onPress={saveOfferChanges}
+            onPress={() =>
+              void saveOfferChanges()
+            }
             disabled={isSaving}
           >
             {isSaving ? (
@@ -455,7 +673,11 @@ export default function EditOfferScreen() {
               pressed && styles.buttonPressed,
               isSaving && styles.disabledButton,
             ]}
-            onPress={() => router.replace("/admin/manage-offers")}
+            onPress={() =>
+              router.replace(
+                "/admin/manage-offers"
+              )
+            }
             disabled={isSaving}
           >
             <Ionicons
@@ -589,6 +811,55 @@ const styles = StyleSheet.create({
     color: "#666666",
     fontSize: 14,
     fontWeight: "800",
+  },
+
+  dateButton: {
+    minHeight: 72,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D7DCD8",
+    backgroundColor: "#FAFBFA",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+  },
+
+  dateButtonPressed: {
+    backgroundColor: "#FFF8EA",
+  },
+
+  dateButtonContent: {
+    flex: 1,
+  },
+
+  dateButtonLabel: {
+    fontSize: 12,
+    color: "#777777",
+  },
+
+  dateButtonValue: {
+    marginTop: 4,
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#202020",
+  },
+
+  datePlaceholder: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#929292",
+  },
+
+  datePickerContainer: {
+    marginTop: 12,
+    minHeight: 355,
+    overflow: "hidden",
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#D8DDD9",
+    justifyContent: "center",
   },
 
   informationBox: {

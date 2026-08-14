@@ -2,6 +2,7 @@
   "expo": {
     "name": "MatbutikkApp",
     "slug": "MatbutikkApp",
+    "owner": "abdu2003",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -38,11 +39,18 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1bce35a0-2438-49cb-bb9b-070cd09b1bf9"
+      }
     }
   }
 }

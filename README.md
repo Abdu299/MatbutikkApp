@@ -1,50 +1,131 @@
-# Welcome to your Expo app 👋
+# MatbutikkApp
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+MatbutikkApp is a mobile grocery store application built with **React Native, Expo and TypeScript**.  
+The app allows customers to view current offers and new products, create an account, like products and offers, and access app-exclusive offers.
 
-## Get started
+The application also includes an **admin panel** where store administrators can manage the content shown to customers.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+### Customer
+- View active store offers with:
+  - Original price
+  - Offer price
+  - Discount percentage
+  - Offer duration
+  - Product image
+- View newly added products
+- Like and unlike products and offers
+- Create an account and log in
+- Edit personal information
+- App-based offer verification screen
+- Persistent login between app sessions
 
-2. Start the app
+### Admin
+- Add new offers
+- Add new products
+- Upload and automatically compress images
+- Edit existing offers and products
+- Activate or hide content
+- Delete offers and products
+- View like statistics and popularity rankings
 
-   ```bash
-   npx expo start
-   ```
+## Main Pages
 
-In the output, you'll find options to open the app in a
+The customer interface uses bottom-tab navigation:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Tilbud** – Shows active offers from the store
+- **Nye produkter** – Shows recently added products
+- **Profil** – Login, registration and account settings
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Additional pages include:
 
-## Get a fresh project
+- **Personopplysninger** – Edit account information
+- **Tilbudskontroll** – Used to verify that a customer has the app
+- **Adminpanel** – Store administration
+- **Administrer tilbud**
+- **Administrer produkter**
+- **Legg til / rediger tilbud**
+- **Legg til / rediger produkt**
+- **Likes** – Popularity statistics
 
-When you're ready, run:
+## Technologies
+
+- **React Native**
+- **Expo**
+- **TypeScript**
+- **Expo Router**
+- **Firebase Authentication**
+- **Cloud Firestore**
+- **AsyncStorage**
+- **Expo Image Picker**
+- **Expo Image Manipulator**
+
+Firebase is used for authentication, user roles, products, offers and like data.  
+Firestore listeners keep offers, products and statistics updated in real time.
+
+## Run the Project
+
+### 1. Clone the repository
 
 ```bash
-npm run reset-project
+git clone https://github.com/Abdu299/MatbutikkApp.git
+cd MatbutikkApp
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Install dependencies
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Start Expo
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+You can then open the application using:
 
-Join our community of developers creating universal apps.
+- **Expo Go** on a physical device
+- Android Emulator
+- iOS Simulator
+- Web browser
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+You can also run:
+
+```bash
+npm run android
+npm run ios
+npm run web
+```
+
+## Firebase
+
+The Firebase setup is located in:
+
+```text
+firebase/firebaseConfig.ts
+```
+
+If you want to connect the application to another Firebase project, replace the Firebase configuration and configure **Firebase Authentication** and **Cloud Firestore** for the new project.
+
+## Project Structure
+
+```text
+app/
+├── (tabs)/              # Customer pages
+├── admin/               # Admin panel and management pages
+├── offer-control.tsx
+└── personal-information.tsx
+
+context/
+└── AuthContext.tsx      # Authentication and user roles
+
+firebase/
+└── firebaseConfig.ts    # Firebase configuration
+```
+
+## Purpose
+
+The project demonstrates how a real mobile application can combine a React Native frontend with Firebase authentication, real-time cloud data, role-based functionality and an administrative content-management interface.
