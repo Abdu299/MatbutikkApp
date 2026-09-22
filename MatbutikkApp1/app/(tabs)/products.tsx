@@ -179,24 +179,30 @@ export default function ProductsScreen() {
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Image
-              source={require("../../assets/images/smak-logo.png")}
-              style={styles.brandLogo}
-              resizeMode="contain"
-              accessibilityLabel="Smak – Mat gleder fra hele verden"
-            />
+            <View style={styles.headerTopRow}>
+              <View style={styles.badge}>
+                <Ionicons
+                  name="sparkles-outline"
+                  size={17}
+                  color="#3F245E"
+                />
 
-            <View style={styles.badge}>
-              <Ionicons
-                name="sparkles-outline"
-                size={17}
-                color="#3F245E"
+                <Text style={styles.badgeText}>
+                  Nytt i butikken
+                </Text>
+              </View>
+
+              <Image
+                source={require("../../assets/images/smak-logo.png")}
+                style={styles.brandLogo}
+                resizeMode="contain"
+                accessibilityLabel="Smak – Mat gleder fra hele verden"
               />
-
-              <Text style={styles.badgeText}>Nytt i butikken</Text>
             </View>
 
-            <Text style={styles.title}>Nye produkter</Text>
+            <Text style={styles.title}>
+              Nye produkter
+            </Text>
 
             <Text style={styles.subtitle}>
               Se de nyeste produktene som har kommet inn i butikken.
@@ -334,15 +340,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
+  headerTopRow: {
+    minHeight: 64,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 14,
+  },
+
   brandLogo: {
-    width: 190,
-    height: 86,
-    alignSelf: "center",
-    marginBottom: 18,
+    width: 132,
+    height: 64,
+    flexShrink: 0,
   },
 
   badge: {
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
@@ -359,7 +371,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    marginTop: 18,
+    marginTop: 14,
     fontSize: 32,
     fontWeight: "900",
     color: "#26252A",

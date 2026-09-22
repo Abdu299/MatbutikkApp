@@ -185,24 +185,30 @@ export default function OffersScreen() {
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
-            <Image
-              source={require("../../assets/images/smak-logo.png")}
-              style={styles.brandLogo}
-              resizeMode="contain"
-              accessibilityLabel="Smak – Mat gleder fra hele verden"
-            />
+            <View style={styles.headerTopRow}>
+              <View style={styles.badge}>
+                <Ionicons
+                  name="pricetag-outline"
+                  size={17}
+                  color="#5A1B6F"
+                />
 
-            <View style={styles.badge}>
-              <Ionicons
-                name="pricetag-outline"
-                size={17}
-                color="#5A1B6F"
+                <Text style={styles.badgeText}>
+                  Ukens tilbud
+                </Text>
+              </View>
+
+              <Image
+                source={require("../../assets/images/smak-logo.png")}
+                style={styles.brandLogo}
+                resizeMode="contain"
+                accessibilityLabel="Smak – Mat gleder fra hele verden"
               />
-
-              <Text style={styles.badgeText}>Ukens tilbud</Text>
             </View>
 
-            <Text style={styles.title}>Gode tilbud</Text>
+            <Text style={styles.title}>
+              Gode tilbud
+            </Text>
 
             <Text style={styles.subtitle}>
               Oppdag de nyeste tilbudene og spar penger på handleturen.
@@ -360,15 +366,21 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
+  headerTopRow: {
+    minHeight: 64,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 14,
+  },
+
   brandLogo: {
-    width: 190,
-    height: 86,
-    alignSelf: "center",
-    marginBottom: 18,
+    width: 132,
+    height: 64,
+    flexShrink: 0,
   },
 
   badge: {
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
@@ -385,7 +397,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    marginTop: 18,
+    marginTop: 14,
     fontSize: 32,
     fontWeight: "900",
     color: "#26252A",
