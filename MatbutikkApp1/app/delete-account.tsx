@@ -1,4 +1,3 @@
-
 import { Ionicons } from "@expo/vector-icons";
 import {
   deleteUser,
@@ -41,9 +40,45 @@ export default function DeleteAccountScreen() {
   const [password, setPassword] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
+  function showMessage(title: string, message: string) {
+    if (
+      Platform.OS === "web" &&
+      typeof window !== "undefined"
+    ) {
+      window.alert(`${title}\n\n${message}`);
+      return;
+    }
+
+    Alert.alert(title, message);
+  }
+
+  function showSuccessAndReturn() {
+    const title = "Konto slettet";
+    const message =
+      "Kontoen og personopplysningene dine er slettet.";
+
+    if (
+      Platform.OS === "web" &&
+      typeof window !== "undefined"
+    ) {
+      window.alert(`${title}\n\n${message}`);
+
+      router.replace("/(tabs)/profile");
+      return;
+    }
+
+    Alert.alert(title, message, [
+      {
+        text: "OK",
+        onPress: () =>
+          router.replace("/(tabs)/profile"),
+      },
+    ]);
+  }
+
   async function performDelete() {
     if (!user || !user.email) {
-      Alert.alert(
+      showMessage(
         "Ikke innlogget",
         "Du må være innlogget for å slette kontoen."
       );
@@ -51,7 +86,7 @@ export default function DeleteAccountScreen() {
     }
 
     if (isAdmin) {
-      Alert.alert(
+      showMessage(
         "Kan ikke slette adminkonto",
         "Adminkontoen kan ikke slettes fra appen."
       );
@@ -59,7 +94,7 @@ export default function DeleteAccountScreen() {
     }
 
     if (!password) {
-      Alert.alert(
+      showMessage(
         "Skriv inn passord",
         "Du må bekrefte passordet ditt."
       );
@@ -74,17 +109,27 @@ export default function DeleteAccountScreen() {
         password
       );
 
-      await reauthenticateWithCredential(user, credential);
+      await reauthenticateWithCredential(
+        user,
+        credential
+      );
 
-      const userReference = doc(db, "users", user.uid);
-      const profileSnapshot = await getDoc(userReference);
+      const userReference = doc(
+        db,
+        "users",
+        user.uid
+      );
+
+      const profileSnapshot =
+        await getDoc(userReference);
 
       await deleteDoc(userReference);
 
       try {
         await deleteUser(user);
       } catch (deleteError) {
-        // Gjenopprett Firestore-profilen dersom Auth-slettingen feiler.
+        // Hvis sletting i Firebase Authentication feiler,
+        // prøver vi å gjenopprette Firestore-profilen.
         if (profileSnapshot.exists()) {
           try {
             await setDoc(
@@ -103,20 +148,12 @@ export default function DeleteAccountScreen() {
       }
 
       setPassword("");
-
-      Alert.alert(
-        "Konto slettet",
-        "Kontoen og personopplysningene dine er slettet.",
-        [
-          {
-            text: "OK",
-            onPress: () =>
-              router.replace("/(tabs)/profile"),
-          },
-        ]
-      );
+      showSuccessAndReturn();
     } catch (error: any) {
-      console.error("Feil ved sletting av konto:", error);
+      console.error(
+        "Feil ved sletting av konto:",
+        error
+      );
 
       let message =
         "Kontoen kunne ikke slettes. Prøv igjen.";
@@ -126,7 +163,9 @@ export default function DeleteAccountScreen() {
         error?.code === "auth/wrong-password"
       ) {
         message = "Passordet er feil.";
-      } else if (error?.code === "auth/too-many-requests") {
+      } else if (
+        error?.code === "auth/too-many-requests"
+      ) {
         message =
           "For mange forsøk. Vent litt og prøv igjen.";
       } else if (
@@ -142,7 +181,10 @@ export default function DeleteAccountScreen() {
           "Firestore-reglene tillater ikke kontosletting.";
       }
 
-      Alert.alert("Kunne ikke slette kontoen", message);
+      showMessage(
+        "Kunne ikke slette kontoen",
+        message
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -150,34 +192,51 @@ export default function DeleteAccountScreen() {
 
   function confirmDelete() {
     if (!password) {
-      Alert.alert(
+      showMessage(
         "Skriv inn passord",
         "Du må bekrefte passordet ditt først."
       );
       return;
     }
 
-    Alert.alert(
-      "Slett kontoen permanent?",
-      "Dette kan ikke angres. Kontoen og personopplysningene dine blir slettet.",
-      [
-        {
-          text: "Avbryt",
-          style: "cancel",
-        },
-        {
-          text: "Slett konto",
-          style: "destructive",
-          onPress: () => void performDelete(),
-        },
-      ]
-    );
+    const title = "Slett kontoen permanent?";
+    const message =
+      "Dette kan ikke angres. Kontoen og personopplysningene dine blir slettet.";
+
+    if (
+      Platform.OS === "web" &&
+      typeof window !== "undefined"
+    ) {
+      const confirmed = window.confirm(
+        `${title}\n\n${message}`
+      );
+
+      if (confirmed) {
+        void performDelete();
+      }
+
+      return;
+    }
+
+    Alert.alert(title, message, [
+      {
+        text: "Avbryt",
+        style: "cancel",
+      },
+      {
+        text: "Slett konto",
+        style: "destructive",
+        onPress: () => void performDelete(),
+      },
+    ]);
   }
 
   if (isLoading) {
     return (
       <>
-        <Stack.Screen options={{ headerShown: false }} />
+        <Stack.Screen
+          options={{ headerShown: false }}
+        />
 
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.centerContainer}>
@@ -185,6 +244,7 @@ export default function DeleteAccountScreen() {
               size="large"
               color="#B42318"
             />
+
             <Text style={styles.loadingText}>
               Laster konto...
             </Text>
@@ -197,7 +257,9 @@ export default function DeleteAccountScreen() {
   if (!isAuthenticated || !user) {
     return (
       <>
-        <Stack.Screen options={{ headerShown: false }} />
+        <Stack.Screen
+          options={{ headerShown: false }}
+        />
 
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.centerContainer}>
@@ -214,7 +276,9 @@ export default function DeleteAccountScreen() {
             <Pressable
               style={styles.loginButton}
               onPress={() =>
-                router.replace("/(tabs)/profile")
+                router.replace(
+                  "/(tabs)/profile"
+                )
               }
             >
               <Text style={styles.loginButtonText}>
@@ -229,7 +293,9 @@ export default function DeleteAccountScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen
+        options={{ headerShown: false }}
+      />
 
       <SafeAreaView
         style={styles.safeArea}
@@ -261,7 +327,9 @@ export default function DeleteAccountScreen() {
         <KeyboardAvoidingView
           style={styles.keyboardView}
           behavior={
-            Platform.OS === "ios" ? "padding" : undefined
+            Platform.OS === "ios"
+              ? "padding"
+              : undefined
           }
         >
           <ScrollView
@@ -320,14 +388,18 @@ export default function DeleteAccountScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.deleteButton,
-                pressed && !isDeleting && styles.pressed,
+                pressed &&
+                  !isDeleting &&
+                  styles.pressed,
                 isDeleting && styles.disabled,
               ]}
               onPress={confirmDelete}
               disabled={isDeleting}
             >
               {isDeleting ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator
+                  color="#FFFFFF"
+                />
               ) : (
                 <Ionicons
                   name="trash-outline"
@@ -336,7 +408,9 @@ export default function DeleteAccountScreen() {
                 />
               )}
 
-              <Text style={styles.deleteButtonText}>
+              <Text
+                style={styles.deleteButtonText}
+              >
                 {isDeleting
                   ? "Sletter konto..."
                   : "Slett konto permanent"}
@@ -348,7 +422,9 @@ export default function DeleteAccountScreen() {
               onPress={() => router.back()}
               disabled={isDeleting}
             >
-              <Text style={styles.cancelButtonText}>
+              <Text
+                style={styles.cancelButtonText}
+              >
                 Avbryt
               </Text>
             </Pressable>
