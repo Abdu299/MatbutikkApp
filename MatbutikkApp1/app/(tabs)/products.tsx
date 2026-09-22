@@ -257,7 +257,7 @@ export default function ProductsScreen() {
                   <Image
                     source={{ uri: productImage }}
                     style={styles.productImage}
-                    resizeMode="cover"
+                    resizeMode="contain"
                   />
                 ) : (
                   <View style={styles.imagePlaceholder}>
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    height: 260,
+    aspectRatio: 4 / 3,
     position: "relative",
     overflow: "hidden",
     backgroundColor: "#EEE7F3",

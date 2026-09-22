@@ -263,7 +263,7 @@ export default function OffersScreen() {
                   <Image
                     source={{ uri: offerImage }}
                     style={styles.offerImage}
-                    resizeMode="cover"
+                    resizeMode="contain"
                   />
                 ) : (
                   <View style={styles.imagePlaceholder}>
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   },
 
   imageContainer: {
-    height: 260,
+    aspectRatio: 4 / 3,
     position: "relative",
     overflow: "hidden",
     backgroundColor: "#E9E0EF",
