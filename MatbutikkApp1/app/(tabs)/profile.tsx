@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -114,29 +115,46 @@ export default function ProfileScreen() {
 
   const [mode, setMode] =
     useState<"login" | "register">("login");
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
   const [isSubmitting, setIsSubmitting] =
     useState(false);
+
+  const [isSendingReset, setIsSendingReset] =
+    useState(false);
+
+  const isBusy = isSubmitting || isSendingReset;
+
+  function showMessage(
+    title: string,
+    message: string
+  ) {
+    if (
+      Platform.OS === "web" &&
+      typeof window !== "undefined"
+    ) {
+      window.alert(`${title}\n\n${message}`);
+      return;
+    }
+
+    Alert.alert(title, message);
+  }
 
   async function openExternalPage(url: string) {
     try {
       await Linking.openURL(url);
     } catch (error) {
-      console.error("Kunne ikke åpne nettsiden:", error);
+      console.error(
+        "Kunne ikke åpne nettsiden:",
+        error
+      );
 
-      if (
-        Platform.OS === "web" &&
-        typeof window !== "undefined"
-      ) {
-        window.alert(
-          "Kunne ikke åpne siden. Prøv igjen senere."
-        );
-        return;
-      }
-
-      Alert.alert(
+      showMessage(
         "Kunne ikke åpne siden",
         "Prøv igjen senere."
       );
@@ -144,10 +162,11 @@ export default function ProfileScreen() {
   }
 
   async function handleLogin() {
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail =
+      email.trim().toLowerCase();
 
     if (!cleanEmail || !password) {
-      Alert.alert(
+      showMessage(
         "Mangler informasjon",
         "Skriv inn e-post og passord."
       );
@@ -165,6 +184,7 @@ export default function ProfileScreen() {
 
       setEmail("");
       setPassword("");
+      setConfirmPassword("");
     } catch (error: any) {
       let message =
         "Kunne ikke logge inn. Kontroller e-post og passord.";
@@ -175,39 +195,121 @@ export default function ProfileScreen() {
         error?.code === "auth/user-not-found"
       ) {
         message = "Feil e-post eller passord.";
-      }
-
-      if (error?.code === "auth/invalid-email") {
-        message = "E-postadressen er ikke gyldig.";
-      }
-
-      if (error?.code === "auth/too-many-requests") {
+      } else if (
+        error?.code === "auth/invalid-email"
+      ) {
+        message =
+          "E-postadressen er ikke gyldig.";
+      } else if (
+        error?.code === "auth/too-many-requests"
+      ) {
         message =
           "For mange innloggingsforsøk. Vent litt og prøv igjen.";
+      } else if (
+        error?.code ===
+        "auth/network-request-failed"
+      ) {
+        message =
+          "Kontroller internettforbindelsen og prøv igjen.";
       }
 
-      Alert.alert("Innlogging mislyktes", message);
+      showMessage(
+        "Innlogging mislyktes",
+        message
+      );
     } finally {
       setIsSubmitting(false);
     }
   }
 
+  async function handleForgotPassword() {
+    const cleanEmail =
+      email.trim().toLowerCase();
+
+    if (!cleanEmail) {
+      showMessage(
+        "Skriv inn e-post",
+        "Skriv inn e-postadressen din først, og trykk deretter på «Glemt passord?»."
+      );
+      return;
+    }
+
+    try {
+      setIsSendingReset(true);
+
+      await sendPasswordResetEmail(
+        auth,
+        cleanEmail
+      );
+
+      showMessage(
+        "E-post sendt",
+        "Hvis det finnes en konto med denne e-postadressen, mottar du en lenke for å lage et nytt passord. Sjekk også søppelpost."
+      );
+    } catch (error: any) {
+      console.error(
+        "Feil ved sending av passordlenke:",
+        error
+      );
+
+      let message =
+        "Kunne ikke sende e-posten. Prøv igjen.";
+
+      if (error?.code === "auth/invalid-email") {
+        message =
+          "E-postadressen er ikke gyldig.";
+      } else if (
+        error?.code === "auth/too-many-requests"
+      ) {
+        message =
+          "For mange forsøk. Vent litt og prøv igjen.";
+      } else if (
+        error?.code ===
+        "auth/network-request-failed"
+      ) {
+        message =
+          "Kontroller internettforbindelsen og prøv igjen.";
+      }
+
+      showMessage(
+        "Kunne ikke sende e-post",
+        message
+      );
+    } finally {
+      setIsSendingReset(false);
+    }
+  }
+
   async function handleRegister() {
     const cleanName = name.trim();
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail =
+      email.trim().toLowerCase();
 
-    if (!cleanName || !cleanEmail || !password) {
-      Alert.alert(
+    if (
+      !cleanName ||
+      !cleanEmail ||
+      !password ||
+      !confirmPassword
+    ) {
+      showMessage(
         "Mangler informasjon",
-        "Skriv inn navn, e-post og passord."
+        "Skriv inn navn, e-post og passord to ganger."
       );
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert(
+      showMessage(
         "Passordet er for kort",
         "Passordet må inneholde minst 6 tegn."
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showMessage(
+        "Passordene er forskjellige",
+        "Passordene du skrev inn er ikke like. Kontroller begge passordfeltene."
       );
       return;
     }
@@ -222,12 +324,19 @@ export default function ProfileScreen() {
           password
         );
 
-      await updateProfile(userCredential.user, {
-        displayName: cleanName,
-      });
+      await updateProfile(
+        userCredential.user,
+        {
+          displayName: cleanName,
+        }
+      );
 
       await setDoc(
-        doc(db, "users", userCredential.user.uid),
+        doc(
+          db,
+          "users",
+          userCredential.user.uid
+        ),
         {
           uid: userCredential.user.uid,
           name: cleanName,
@@ -242,38 +351,67 @@ export default function ProfileScreen() {
       setName("");
       setEmail("");
       setPassword("");
+      setConfirmPassword("");
 
-      Alert.alert(
+      showMessage(
         "Konto opprettet",
         "Du er nå registrert og innlogget."
       );
     } catch (error: any) {
-      let message = "Kunne ikke opprette brukeren.";
+      let message =
+        "Kunne ikke opprette brukeren.";
 
-      if (error?.code === "auth/email-already-in-use") {
+      if (
+        error?.code ===
+        "auth/email-already-in-use"
+      ) {
         message =
           "Det finnes allerede en bruker med denne e-postadressen.";
-      }
-
-      if (error?.code === "auth/invalid-email") {
-        message = "E-postadressen er ikke gyldig.";
-      }
-
-      if (error?.code === "auth/weak-password") {
+      } else if (
+        error?.code === "auth/invalid-email"
+      ) {
+        message =
+          "E-postadressen er ikke gyldig.";
+      } else if (
+        error?.code === "auth/weak-password"
+      ) {
         message = "Passordet er for svakt.";
+      } else if (
+        error?.code ===
+        "auth/network-request-failed"
+      ) {
+        message =
+          "Kontroller internettforbindelsen og prøv igjen.";
       }
 
-      Alert.alert("Registrering mislyktes", message);
+      showMessage(
+        "Registrering mislyktes",
+        message
+      );
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function switchMode() {
+    setMode((currentMode) =>
+      currentMode === "login"
+        ? "register"
+        : "login"
+    );
+
+    setPassword("");
+    setConfirmPassword("");
   }
 
   async function handleLogout() {
     try {
       await signOut(auth);
     } catch {
-      Alert.alert("Feil", "Kunne ikke logge ut.");
+      showMessage(
+        "Feil",
+        "Kunne ikke logge ut."
+      );
     }
   }
 
@@ -304,13 +442,17 @@ export default function ProfileScreen() {
       "Bruker";
 
     const displayEmail =
-      userProfile?.email || user.email || "";
+      userProfile?.email ||
+      user.email ||
+      "";
 
     const initials = displayName
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map((part) => part.charAt(0).toUpperCase())
+      .map((part) =>
+        part.charAt(0).toUpperCase()
+      )
       .join("");
 
     return (
@@ -325,7 +467,9 @@ export default function ProfileScreen() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.pageTitle}>
-            {isAdmin ? "Adminprofil" : "Min profil"}
+            {isAdmin
+              ? "Adminprofil"
+              : "Min profil"}
           </Text>
 
           <View style={styles.userCard}>
@@ -358,11 +502,18 @@ export default function ProfileScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.adminButton,
-                pressed && styles.buttonPressed,
+                pressed &&
+                  styles.buttonPressed,
               ]}
-              onPress={() => router.push("/admin")}
+              onPress={() =>
+                router.push("/admin")
+              }
             >
-              <View style={styles.adminButtonIcon}>
+              <View
+                style={
+                  styles.adminButtonIcon
+                }
+              >
                 <Ionicons
                   name="settings-outline"
                   size={22}
@@ -371,14 +522,22 @@ export default function ProfileScreen() {
               </View>
 
               <View
-                style={styles.adminButtonTextContainer}
+                style={
+                  styles.adminButtonTextContainer
+                }
               >
-                <Text style={styles.adminButtonTitle}>
+                <Text
+                  style={
+                    styles.adminButtonTitle
+                  }
+                >
                   Åpne adminpanelet
                 </Text>
 
                 <Text
-                  style={styles.adminButtonSubtitle}
+                  style={
+                    styles.adminButtonSubtitle
+                  }
                 >
                   Administrer produkter og tilbud
                 </Text>
@@ -408,14 +567,18 @@ export default function ProfileScreen() {
               }
             />
 
-            <View style={styles.menuDivider} />
+            <View
+              style={styles.menuDivider}
+            />
 
             <ProfileMenuItem
               icon="ticket-outline"
               title="Tilbudskontroll"
               subtitle="Vis at du har appen for å få tilbudet"
               onPress={() =>
-                router.push("/offer-control" as never)
+                router.push(
+                  "/offer-control" as never
+                )
               }
             />
           </View>
@@ -430,24 +593,34 @@ export default function ProfileScreen() {
               title="Hjelp og kundeservice"
               subtitle="Finn svar eller kontakt butikken"
               onPress={() =>
-                void openExternalPage(HELP_URL)
+                void openExternalPage(
+                  HELP_URL
+                )
               }
             />
 
-            <View style={styles.menuDivider} />
+            <View
+              style={styles.menuDivider}
+            />
 
             <ProfileMenuItem
               icon="document-text-outline"
               title="Vilkår og personvern"
               subtitle="Les våre vilkår og personvernregler"
               onPress={() =>
-                void openExternalPage(PRIVACY_URL)
+                void openExternalPage(
+                  PRIVACY_URL
+                )
               }
             />
 
             {!isAdmin && (
               <>
-                <View style={styles.menuDivider} />
+                <View
+                  style={
+                    styles.menuDivider
+                  }
+                />
 
                 <ProfileMenuItem
                   icon="trash-outline"
@@ -467,7 +640,8 @@ export default function ProfileScreen() {
           <Pressable
             style={({ pressed }) => [
               styles.logoutButton,
-              pressed && styles.buttonPressed,
+              pressed &&
+                styles.buttonPressed,
             ]}
             onPress={handleLogout}
           >
@@ -477,7 +651,11 @@ export default function ProfileScreen() {
               color="#B42318"
             />
 
-            <Text style={styles.logoutButtonText}>
+            <Text
+              style={
+                styles.logoutButtonText
+              }
+            >
               Logg ut
             </Text>
           </Pressable>
@@ -500,7 +678,9 @@ export default function ProfileScreen() {
         }
       >
         <ScrollView
-          contentContainerStyle={styles.authContainer}
+          contentContainerStyle={
+            styles.authContainer
+          }
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -518,7 +698,9 @@ export default function ProfileScreen() {
               : "Opprett konto"}
           </Text>
 
-          <Text style={styles.authDescription}>
+          <Text
+            style={styles.authDescription}
+          >
             {mode === "login"
               ? "Logg inn for å få tilgang til profilen din."
               : "Registrer deg for å opprette en personlig konto."}
@@ -526,7 +708,9 @@ export default function ProfileScreen() {
 
           {mode === "register" && (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>
+              <Text
+                style={styles.inputLabel}
+              >
                 Navn
               </Text>
 
@@ -537,6 +721,7 @@ export default function ProfileScreen() {
                 placeholder="Skriv inn navnet ditt"
                 placeholderTextColor="#999999"
                 autoCapitalize="words"
+                editable={!isBusy}
               />
             </View>
           )}
@@ -555,6 +740,7 @@ export default function ProfileScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+              editable={!isBusy}
             />
           </View>
 
@@ -571,14 +757,83 @@ export default function ProfileScreen() {
               placeholderTextColor="#999999"
               secureTextEntry
               autoCapitalize="none"
+              autoCorrect={false}
+              editable={!isBusy}
             />
           </View>
+
+          {mode === "register" && (
+            <View style={styles.inputGroup}>
+              <Text
+                style={styles.inputLabel}
+              >
+                Gjenta passord
+              </Text>
+
+              <TextInput
+                style={styles.input}
+                value={confirmPassword}
+                onChangeText={
+                  setConfirmPassword
+                }
+                placeholder="Skriv inn passordet på nytt"
+                placeholderTextColor="#999999"
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isBusy}
+                onSubmitEditing={
+                  handleRegister
+                }
+              />
+            </View>
+          )}
+
+          {mode === "login" && (
+            <Pressable
+              style={({ pressed }) => [
+                styles.forgotPasswordButton,
+                pressed &&
+                  styles.buttonPressed,
+              ]}
+              onPress={
+                handleForgotPassword
+              }
+              disabled={isBusy}
+            >
+              {isSendingReset ? (
+                <>
+                  <ActivityIndicator
+                    size="small"
+                    color="#1F7A3D"
+                  />
+
+                  <Text
+                    style={
+                      styles.forgotPasswordText
+                    }
+                  >
+                    Sender e-post...
+                  </Text>
+                </>
+              ) : (
+                <Text
+                  style={
+                    styles.forgotPasswordText
+                  }
+                >
+                  Glemt passord?
+                </Text>
+              )}
+            </Pressable>
+          )}
 
           <Pressable
             style={({ pressed }) => [
               styles.primaryButton,
-              pressed && styles.buttonPressed,
-              isSubmitting &&
+              pressed &&
+                styles.buttonPressed,
+              isBusy &&
                 styles.disabledButton,
             ]}
             onPress={
@@ -586,13 +841,17 @@ export default function ProfileScreen() {
                 ? handleLogin
                 : handleRegister
             }
-            disabled={isSubmitting}
+            disabled={isBusy}
           >
             {isSubmitting ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator
+                color="#FFFFFF"
+              />
             ) : (
               <Text
-                style={styles.primaryButtonText}
+                style={
+                  styles.primaryButtonText
+                }
               >
                 {mode === "login"
                   ? "Logg inn"
@@ -603,14 +862,8 @@ export default function ProfileScreen() {
 
           <Pressable
             style={styles.switchButton}
-            onPress={() =>
-              setMode((currentMode) =>
-                currentMode === "login"
-                  ? "register"
-                  : "login"
-              )
-            }
-            disabled={isSubmitting}
+            onPress={switchMode}
+            disabled={isBusy}
           >
             <Text style={styles.switchText}>
               {mode === "login"
@@ -618,7 +871,9 @@ export default function ProfileScreen() {
                 : "Har du allerede konto? "}
             </Text>
 
-            <Text style={styles.switchTextBold}>
+            <Text
+              style={styles.switchTextBold}
+            >
               {mode === "login"
                 ? "Registrer deg"
                 : "Logg inn"}
@@ -720,7 +975,8 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.16)",
+    backgroundColor:
+      "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -738,7 +994,8 @@ const styles = StyleSheet.create({
 
   adminButtonSubtitle: {
     marginTop: 3,
-    color: "rgba(255,255,255,0.78)",
+    color:
+      "rgba(255,255,255,0.78)",
     fontSize: 12,
   },
 
@@ -893,6 +1150,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     color: "#171717",
     fontSize: 16,
+  },
+
+  forgotPasswordButton: {
+    minHeight: 38,
+    marginTop: -7,
+    marginBottom: 8,
+    alignSelf: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingHorizontal: 4,
+  },
+
+  forgotPasswordText: {
+    color: "#1F7A3D",
+    fontSize: 14,
+    fontWeight: "800",
   },
 
   primaryButton: {
