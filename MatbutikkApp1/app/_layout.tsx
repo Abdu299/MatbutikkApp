@@ -45,58 +45,30 @@ export default function RootLayout() {
         />
 
         <Stack.Screen
-          name="admin/index"
+          name="offer-control"
           options={{
-            title: "Adminpanel",
+            headerShown: false,
           }}
         />
 
         <Stack.Screen
-          name="admin/add-product"
+          name="personal-information"
           options={{
-            title: "Legg til produkt",
+            headerShown: false,
           }}
         />
 
         <Stack.Screen
-          name="admin/add-offer"
+          name="delete-account"
           options={{
-            title: "Legg til tilbud",
+            headerShown: false,
           }}
         />
 
         <Stack.Screen
-          name="admin/manage-products"
+          name="admin"
           options={{
-            title: "Administrer produkter",
-          }}
-        />
-
-        <Stack.Screen
-          name="admin/manage-offers"
-          options={{
-            title: "Administrer tilbud",
-          }}
-        />
-
-        <Stack.Screen
-          name="admin/edit-product"
-          options={{
-            title: "Rediger produkt",
-          }}
-        />
-
-        <Stack.Screen
-          name="admin/edit-offer"
-          options={{
-            title: "Rediger tilbud",
-          }}
-        />
-
-        <Stack.Screen
-          name="admin/login"
-          options={{
-            title: "Logg inn",
+            headerShown: false,
           }}
         />
       </Stack>

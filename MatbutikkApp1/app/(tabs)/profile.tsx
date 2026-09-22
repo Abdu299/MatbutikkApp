@@ -30,6 +30,7 @@ type ProfileMenuItemProps = {
   title: string;
   subtitle: string;
   onPress: () => void;
+  danger?: boolean;
 };
 
 function ProfileMenuItem({
@@ -37,6 +38,7 @@ function ProfileMenuItem({
   title,
   subtitle,
   onPress,
+  danger = false,
 }: ProfileMenuItemProps) {
   return (
     <Pressable
@@ -46,19 +48,38 @@ function ProfileMenuItem({
       ]}
       onPress={onPress}
     >
-      <View style={styles.menuIcon}>
-        <Ionicons name={icon} size={21} color="#1F7A3D" />
+      <View
+        style={[
+          styles.menuIcon,
+          danger && styles.menuIconDanger,
+        ]}
+      >
+        <Ionicons
+          name={icon}
+          size={21}
+          color={danger ? "#B42318" : "#1F7A3D"}
+        />
       </View>
 
       <View style={styles.menuTextContainer}>
-        <Text style={styles.menuTitle}>{title}</Text>
-        <Text style={styles.menuSubtitle}>{subtitle}</Text>
+        <Text
+          style={[
+            styles.menuTitle,
+            danger && styles.menuTitleDanger,
+          ]}
+        >
+          {title}
+        </Text>
+
+        <Text style={styles.menuSubtitle}>
+          {subtitle}
+        </Text>
       </View>
 
       <Ionicons
         name="chevron-forward-outline"
         size={21}
-        color="#9A9A9A"
+        color={danger ? "#D66A62" : "#9A9A9A"}
       />
     </Pressable>
   );
@@ -74,14 +95,19 @@ export default function ProfileScreen() {
     refreshUserProfile,
   } = useAuth();
 
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] =
+    useState<"login" | "register">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
 
   function showComingSoon(title: string) {
-    Alert.alert(title, "Denne funksjonen blir tilgjengelig senere.");
+    Alert.alert(
+      title,
+      "Denne funksjonen blir tilgjengelig senere."
+    );
   }
 
   async function handleLogin() {
@@ -107,8 +133,6 @@ export default function ProfileScreen() {
       setEmail("");
       setPassword("");
     } catch (error: any) {
-      //console.error("Feil ved innlogging:", error);
-
       let message =
         "Kunne ikke logge inn. Kontroller e-post og passord.";
 
@@ -191,8 +215,6 @@ export default function ProfileScreen() {
         "Du er nå registrert og innlogget."
       );
     } catch (error: any) {
-      //console.error("Feil ved registrering:", error);
-
       let message = "Kunne ikke opprette brukeren.";
 
       if (error?.code === "auth/email-already-in-use") {
@@ -217,18 +239,26 @@ export default function ProfileScreen() {
   async function handleLogout() {
     try {
       await signOut(auth);
-    } catch (error) {
-      //console.error("Feil ved utlogging:", error);
+    } catch {
       Alert.alert("Feil", "Kunne ikke logge ut.");
     }
   }
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <SafeAreaView
+        style={styles.safeArea}
+        edges={["top"]}
+      >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1F7A3D" />
-          <Text style={styles.loadingText}>Laster profil...</Text>
+          <ActivityIndicator
+            size="large"
+            color="#1F7A3D"
+          />
+
+          <Text style={styles.loadingText}>
+            Laster profil...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -251,9 +281,14 @@ export default function ProfileScreen() {
       .join("");
 
     return (
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <SafeAreaView
+        style={styles.safeArea}
+        edges={["top"]}
+      >
         <ScrollView
-          contentContainerStyle={styles.profileContainer}
+          contentContainerStyle={
+            styles.profileContainer
+          }
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.pageTitle}>
@@ -276,8 +311,13 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.userInformation}>
-              <Text style={styles.userName}>{displayName}</Text>
-              <Text style={styles.userEmail}>{displayEmail}</Text>
+              <Text style={styles.userName}>
+                {displayName}
+              </Text>
+
+              <Text style={styles.userEmail}>
+                {displayEmail}
+              </Text>
             </View>
           </View>
 
@@ -297,12 +337,16 @@ export default function ProfileScreen() {
                 />
               </View>
 
-              <View style={styles.adminButtonTextContainer}>
+              <View
+                style={styles.adminButtonTextContainer}
+              >
                 <Text style={styles.adminButtonTitle}>
                   Åpne adminpanelet
                 </Text>
 
-                <Text style={styles.adminButtonSubtitle}>
+                <Text
+                  style={styles.adminButtonSubtitle}
+                >
                   Administrer produkter og tilbud
                 </Text>
               </View>
@@ -315,25 +359,33 @@ export default function ProfileScreen() {
             </Pressable>
           )}
 
-          <Text style={styles.sectionTitle}>Konto</Text>
+          <Text style={styles.sectionTitle}>
+            Konto
+          </Text>
 
           <View style={styles.menuCard}>
-  <ProfileMenuItem
-    icon="person-outline"
-    title="Personopplysninger"
-    subtitle="Se og endre navn og kontoinformasjon"
-    onPress={() => router.push("/personal-information" as never)}
-  />
+            <ProfileMenuItem
+              icon="person-outline"
+              title="Personopplysninger"
+              subtitle="Se og endre navn og kontoinformasjon"
+              onPress={() =>
+                router.push(
+                  "/personal-information" as never
+                )
+              }
+            />
 
-  <View style={styles.menuDivider} />
+            <View style={styles.menuDivider} />
 
-  <ProfileMenuItem
-    icon="ticket-outline"
-    title="Tilbudskontroll"
-    subtitle="Vis at du har appen for å få tilbudet"
-    onPress={() => router.push("/offer-control" as never)}
-  />
-</View>
+            <ProfileMenuItem
+              icon="ticket-outline"
+              title="Tilbudskontroll"
+              subtitle="Vis at du har appen for å få tilbudet"
+              onPress={() =>
+                router.push("/offer-control" as never)
+              }
+            />
+          </View>
 
           <Text style={styles.sectionTitle}>
             Hjelp og informasjon
@@ -345,7 +397,9 @@ export default function ProfileScreen() {
               title="Hjelp og kundeservice"
               subtitle="Finn svar eller kontakt butikken"
               onPress={() =>
-                showComingSoon("Hjelp og kundeservice")
+                showComingSoon(
+                  "Hjelp og kundeservice"
+                )
               }
             />
 
@@ -356,9 +410,29 @@ export default function ProfileScreen() {
               title="Vilkår og personvern"
               subtitle="Les våre vilkår og personvernregler"
               onPress={() =>
-                showComingSoon("Vilkår og personvern")
+                showComingSoon(
+                  "Vilkår og personvern"
+                )
               }
             />
+
+            {!isAdmin && (
+              <>
+                <View style={styles.menuDivider} />
+
+                <ProfileMenuItem
+                  icon="trash-outline"
+                  title="Slett konto"
+                  subtitle="Slett kontoen og personopplysningene dine"
+                  danger
+                  onPress={() =>
+                    router.push(
+                      "/delete-account" as never
+                    )
+                  }
+                />
+              </>
+            )}
           </View>
 
           <Pressable
@@ -374,20 +448,27 @@ export default function ProfileScreen() {
               color="#B42318"
             />
 
-            <Text style={styles.logoutButtonText}>Logg ut</Text>
+            <Text style={styles.logoutButtonText}>
+              Logg ut
+            </Text>
           </Pressable>
-
-          
         </ScrollView>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top"]}
+    >
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={
+          Platform.OS === "ios"
+            ? "padding"
+            : undefined
+        }
       >
         <ScrollView
           contentContainerStyle={styles.authContainer}
@@ -416,7 +497,9 @@ export default function ProfileScreen() {
 
           {mode === "register" && (
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Navn</Text>
+              <Text style={styles.inputLabel}>
+                Navn
+              </Text>
 
               <TextInput
                 style={styles.input}
@@ -430,7 +513,9 @@ export default function ProfileScreen() {
           )}
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>E-post</Text>
+            <Text style={styles.inputLabel}>
+              E-post
+            </Text>
 
             <TextInput
               style={styles.input}
@@ -445,7 +530,9 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Passord</Text>
+            <Text style={styles.inputLabel}>
+              Passord
+            </Text>
 
             <TextInput
               style={styles.input}
@@ -462,7 +549,8 @@ export default function ProfileScreen() {
             style={({ pressed }) => [
               styles.primaryButton,
               pressed && styles.buttonPressed,
-              isSubmitting && styles.disabledButton,
+              isSubmitting &&
+                styles.disabledButton,
             ]}
             onPress={
               mode === "login"
@@ -474,7 +562,9 @@ export default function ProfileScreen() {
             {isSubmitting ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.primaryButtonText}>
+              <Text
+                style={styles.primaryButtonText}
+              >
                 {mode === "login"
                   ? "Logg inn"
                   : "Opprett konto"}
@@ -660,6 +750,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  menuIconDanger: {
+    backgroundColor: "#FFF0EE",
+  },
+
   menuTextContainer: {
     flex: 1,
     marginLeft: 13,
@@ -670,6 +764,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "800",
     color: "#202020",
+  },
+
+  menuTitleDanger: {
+    color: "#B42318",
   },
 
   menuSubtitle: {
