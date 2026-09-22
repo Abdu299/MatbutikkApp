@@ -349,7 +349,7 @@ export default function OffersScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F7F4EE",
+    backgroundColor: "#F7F2F8",
   },
 
   container: {

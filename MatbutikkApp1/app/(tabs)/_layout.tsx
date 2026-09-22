@@ -7,14 +7,15 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "#5A1B6F",
-        tabBarInactiveTintColor: "#777777",
+        tabBarInactiveTintColor: "#77727A",
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           height: 82,
           paddingTop: 8,
           paddingBottom: 18,
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "#F7F2F8",
           borderTopWidth: 1,
-          borderTopColor: "#E5E5E5",
+          borderTopColor: "#E4D8E8",
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -26,8 +27,12 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Tilbud",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="pricetag-outline" color={color} size={size} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "pricetag" : "pricetag-outline"}
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
@@ -36,8 +41,12 @@ export default function TabsLayout() {
         name="products"
         options={{
           title: "Nye produkter",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="basket-outline" color={color} size={size} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "basket" : "basket-outline"}
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
@@ -46,8 +55,12 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: "Profil",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" color={color} size={size} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
