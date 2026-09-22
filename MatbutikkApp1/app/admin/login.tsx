@@ -117,7 +117,7 @@ export default function AdminLoginScreen() {
             <Ionicons
               name="lock-closed-outline"
               size={17}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
 
             <Text style={styles.badgeText}>
@@ -266,7 +266,7 @@ export default function AdminLoginScreen() {
           <Ionicons
             name="information-circle-outline"
             size={22}
-            color="#2166A5"
+            color="#3F245E"
           />
 
           <Text style={styles.informationText}>
@@ -282,7 +282,7 @@ export default function AdminLoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000000",
@@ -327,11 +327,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
   },
 
   badgeText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 13,
     fontWeight: "800",
   },
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 30,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
     textAlign: "center",
   },
 
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   inputGroup: {
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: "800",
-    color: "#292929",
+    color: "#26252A",
   },
 
   inputContainer: {
@@ -381,8 +381,8 @@ const styles = StyleSheet.create({
     paddingRight: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D7DCD8",
-    backgroundColor: "#FAFBFA",
+    borderColor: "#DED6CC",
+    backgroundColor: "#FBF9F5",
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     minHeight: 52,
-    color: "#202020",
+    color: "#26252A",
     fontSize: 15,
   },
 
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     minHeight: 55,
     marginTop: 4,
     borderRadius: 13,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

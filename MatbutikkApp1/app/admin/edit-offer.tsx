@@ -272,7 +272,7 @@ export default function EditOfferScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1F7A3D" />
+        <ActivityIndicator size="large" color="#5A1B6F" />
 
         <Text style={styles.loadingText}>
           Henter tilbud...
@@ -477,7 +477,7 @@ export default function EditOfferScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 29,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   inputGroup: {
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: "800",
-    color: "#292929",
+    color: "#26252A",
   },
 
   input: {
@@ -545,9 +545,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D7DCD8",
-    backgroundColor: "#FAFBFA",
-    color: "#202020",
+    borderColor: "#DED6CC",
+    backgroundColor: "#FBF9F5",
+    color: "#26252A",
     fontSize: 15,
   },
 
@@ -572,15 +572,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D7DCD8",
-    backgroundColor: "#FAFBFA",
+    borderColor: "#DED6CC",
+    backgroundColor: "#FBF9F5",
     flexDirection: "row",
     alignItems: "center",
   },
 
   priceInput: {
     flex: 1,
-    color: "#202020",
+    color: "#26252A",
     fontSize: 15,
   },
 
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
   saveButton: {
     minHeight: 54,
     borderRadius: 13,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   loadingText: {

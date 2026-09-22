@@ -128,7 +128,7 @@ export default function LikesScreen() {
         ]}
         onPress={() => router.back()}
       >
-        <Ionicons name="arrow-back-outline" size={21} color="#202020" />
+        <Ionicons name="arrow-back-outline" size={21} color="#26252A" />
         <Text style={styles.backButtonText}>Tilbake til administrasjon</Text>
       </Pressable>
 
@@ -157,7 +157,7 @@ export default function LikesScreen() {
 
         <View style={[styles.summaryCard, styles.productSummaryCard]}>
           <View style={[styles.summaryIcon, styles.productSummaryIcon]}>
-            <Ionicons name="cube" size={24} color="#2166A5" />
+            <Ionicons name="cube" size={24} color="#3F245E" />
           </View>
 
           <Text style={styles.summaryNumber}>{totalProductLikes}</Text>
@@ -230,7 +230,7 @@ export default function LikesScreen() {
       <View style={styles.productSection}>
         <View style={styles.sectionHeader}>
           <View style={[styles.sectionIcon, styles.productSectionIcon]}>
-            <Ionicons name="cube-outline" size={22} color="#2166A5" />
+            <Ionicons name="cube-outline" size={22} color="#3F245E" />
           </View>
 
           <View>
@@ -243,7 +243,7 @@ export default function LikesScreen() {
 
         {sortedProducts.length === 0 ? (
           <View style={styles.smallEmptyCard}>
-            <Ionicons name="cube-outline" size={38} color="#2166A5" />
+            <Ionicons name="cube-outline" size={38} color="#3F245E" />
             <Text style={styles.emptyTitle}>Ingen produkter ennå</Text>
           </View>
         ) : (
@@ -265,7 +265,7 @@ export default function LikesScreen() {
                   <Ionicons
                     name="cube-outline"
                     size={14}
-                    color="#2166A5"
+                    color="#3F245E"
                   />
                   <Text style={[styles.itemType, styles.productTypeText]}>
                     Produkt
@@ -288,7 +288,7 @@ export default function LikesScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D8DDD9",
+    borderColor: "#DED6CC",
     backgroundColor: "#FFFFFF",
     flexDirection: "row",
     alignItems: "center",
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   },
 
   backButtonText: {
-    color: "#202020",
+    color: "#26252A",
     fontSize: 14,
     fontWeight: "800",
   },
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 30,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
 
   productSummaryCard: {
-    borderColor: "#C8DDF0",
+    borderColor: "#E1D4EB",
   },
 
   summaryIcon: {
@@ -388,13 +388,13 @@ const styles = StyleSheet.create({
   },
 
   productSummaryIcon: {
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   summaryNumber: {
     fontSize: 27,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   summaryLabel: {
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#C8DDF0",
+    borderColor: "#E1D4EB",
     backgroundColor: "#F8FBFE",
   },
 
@@ -460,13 +460,13 @@ const styles = StyleSheet.create({
   },
 
   productSectionIcon: {
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   sectionTitle: {
     fontSize: 18,
     fontWeight: "900",
-    color: "#222222",
+    color: "#26252A",
   },
 
   sectionSubtitle: {
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   },
 
   productRankCircle: {
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   rankText: {
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   typeRow: {
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
   },
 
   productTypeText: {
-    color: "#2166A5",
+    color: "#3F245E",
   },
 
   likeBadge: {
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
     minHeight: 140,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#E2E5E2",
+    borderColor: "#E5DED5",
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
@@ -579,12 +579,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 16,
     fontWeight: "900",
-    color: "#303030",
+    color: "#26252A",
   },
 
   centerContainer: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
     alignItems: "center",
     justifyContent: "center",
   },

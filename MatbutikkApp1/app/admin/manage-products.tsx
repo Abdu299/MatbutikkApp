@@ -211,7 +211,7 @@ export default function ManageProductsScreen() {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1F7A3D" />
+        <ActivityIndicator size="large" color="#5A1B6F" />
 
         <Text style={styles.loadingText}>Henter produkter...</Text>
       </View>
@@ -237,7 +237,7 @@ export default function ManageProductsScreen() {
               ]}
               onPress={() => router.back()}
             >
-              <Ionicons name="arrow-back-outline" size={21} color="#202020" />
+              <Ionicons name="arrow-back-outline" size={21} color="#26252A" />
               <Text style={styles.adminBackButtonText}>
                 Tilbake til administrasjon
               </Text>
@@ -320,7 +320,7 @@ export default function ManageProductsScreen() {
                   <Ionicons
                     name={item.isActive ? "cube" : "eye-off-outline"}
                     size={27}
-                    color={item.isActive ? "#2166A5" : "#777777"}
+                    color={item.isActive ? "#3F245E" : "#777777"}
                   />
                 </View>
 
@@ -374,7 +374,7 @@ export default function ManageProductsScreen() {
                   <Ionicons
                     name="create-outline"
                     size={19}
-                    color="#2166A5"
+                    color="#3F245E"
                   />
 
                   <Text style={styles.editButtonText}>
@@ -399,7 +399,7 @@ export default function ManageProductsScreen() {
                   {isUpdating ? (
                     <ActivityIndicator
                       size="small"
-                      color={item.isActive ? "#8A5A00" : "#1F7A3D"}
+                      color={item.isActive ? "#8A5A00" : "#5A1B6F"}
                     />
                   ) : (
                     <Ionicons
@@ -409,7 +409,7 @@ export default function ManageProductsScreen() {
                           : "eye-outline"
                       }
                       size={19}
-                      color={item.isActive ? "#8A5A00" : "#1F7A3D"}
+                      color={item.isActive ? "#8A5A00" : "#5A1B6F"}
                     />
                   )}
 
@@ -454,7 +454,7 @@ export default function ManageProductsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 29,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   summaryNumber: {
     fontSize: 21,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
     textAlign: "center",
   },
 
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   inactiveCard: {
@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
   },
 
   activeIcon: {
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   inactiveIcon: {
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   statusBadge: {
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
   },
 
   activeStatusText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   inactiveStatusText: {
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     marginTop: 9,
     fontSize: 17,
     fontWeight: "900",
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   editActionContainer: {
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
   editButton: {
     minHeight: 46,
     borderRadius: 11,
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
     borderWidth: 1,
     borderColor: "#B8CEE0",
     flexDirection: "row",
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
   },
 
   editButtonText: {
-    color: "#2166A5",
+    color: "#3F245E",
     fontSize: 13,
     fontWeight: "800",
   },
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
   },
 
   activateButton: {
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
     borderColor: "#8CB397",
   },
 
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
   },
 
   activateButtonText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   deactivateButtonText: {
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D8DDD9",
+    borderColor: "#DED6CC",
     backgroundColor: "#FFFFFF",
     flexDirection: "row",
     alignItems: "center",
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
   },
 
   adminBackButtonText: {
-    color: "#202020",
+    color: "#26252A",
     fontSize: 14,
     fontWeight: "800",
   },
@@ -746,7 +746,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   loadingText: {
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 20,
     fontWeight: "900",
-    color: "#303030",
+    color: "#26252A",
   },
 
   emptyText: {

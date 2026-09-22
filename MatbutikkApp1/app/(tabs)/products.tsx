@@ -160,7 +160,7 @@ export default function ProductsScreen() {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#1F7A3D" />
+          <ActivityIndicator size="large" color="#5A1B6F" />
           <Text style={styles.loadingText}>Henter produkter...</Text>
         </View>
       </SafeAreaView>
@@ -179,11 +179,18 @@ export default function ProductsScreen() {
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
+            <Image
+              source={require("../../assets/images/smak-logo.png")}
+              style={styles.brandLogo}
+              resizeMode="contain"
+              accessibilityLabel="Smak – Mat gleder fra hele verden"
+            />
+
             <View style={styles.badge}>
               <Ionicons
                 name="sparkles-outline"
                 size={17}
-                color="#2166A5"
+                color="#3F245E"
               />
 
               <Text style={styles.badgeText}>Nytt i butikken</Text>
@@ -251,7 +258,7 @@ export default function ProductsScreen() {
                     <Ionicons
                       name="cube-outline"
                       size={45}
-                      color="#2166A5"
+                      color="#3F245E"
                     />
 
                     <Text style={styles.noImageText}>Produktbilde</Text>
@@ -310,7 +317,7 @@ export default function ProductsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -327,6 +334,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
+  brandLogo: {
+    width: 190,
+    height: 86,
+    alignSelf: "center",
+    marginBottom: 18,
+  },
+
   badge: {
     alignSelf: "flex-start",
     flexDirection: "row",
@@ -335,11 +349,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   badgeText: {
-    color: "#2166A5",
+    color: "#3F245E",
     fontSize: 13,
     fontWeight: "800",
   },
@@ -348,7 +362,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 32,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -364,7 +378,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   cardPressed: {
@@ -376,7 +390,7 @@ const styles = StyleSheet.create({
     height: 260,
     position: "relative",
     overflow: "hidden",
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   productImage: {
@@ -394,7 +408,7 @@ const styles = StyleSheet.create({
     marginTop: 9,
     fontSize: 13,
     fontWeight: "700",
-    color: "#52789A",
+    color: "#6E5685",
   },
 
   newBadge: {
@@ -404,7 +418,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: "#2166A5",
+    backgroundColor: "#3F245E",
   },
 
   newBadgeText: {
@@ -447,7 +461,7 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 19,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   description: {
@@ -461,7 +475,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 21,
     fontWeight: "900",
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   centerContainer: {
@@ -488,7 +502,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 20,
     fontWeight: "900",
-    color: "#303030",
+    color: "#26252A",
   },
 
   emptyText: {

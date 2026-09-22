@@ -36,7 +36,7 @@ export default function OfferControlScreen() {
             <Ionicons
               name="chevron-back-outline"
               size={26}
-              color="#202020"
+              color="#26252A"
             />
           </Pressable>
 
@@ -53,7 +53,7 @@ export default function OfferControlScreen() {
             <Ionicons
               name="phone-portrait-outline"
               size={17}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
 
             <Text style={styles.badgeText}>Kun for appbrukere</Text>
@@ -78,7 +78,7 @@ export default function OfferControlScreen() {
             <Ionicons
               name="information-circle-outline"
               size={23}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
 
             <Text style={styles.informationText}>
@@ -111,7 +111,7 @@ export default function OfferControlScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   header: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   headerSpace: {
@@ -154,14 +154,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
   },
 
   badgeText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 13,
     fontWeight: "800",
   },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
     fontSize: 30,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   description: {
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     padding: 35,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#DDE3DE",
+    borderColor: "#E5DED5",
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     padding: 15,
     borderRadius: 14,
-    backgroundColor: "#E7F4EA",
+    backgroundColor: "#EAF4F2",
     flexDirection: "row",
     alignItems: "center",
     gap: 11,
@@ -211,14 +211,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: "#205C32",
+    color: "#3F245E",
   },
 
   controlButton: {
     minHeight: 58,
     marginTop: 24,
     borderRadius: 14,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

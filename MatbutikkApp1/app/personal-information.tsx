@@ -100,7 +100,7 @@ export default function PersonalInformationScreen() {
 
         <SafeAreaView style={styles.safeArea} edges={["top"]}>
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#1F7A3D" />
+            <ActivityIndicator size="large" color="#5A1B6F" />
 
             <Text style={styles.loadingText}>
               Laster personopplysninger...
@@ -121,7 +121,7 @@ export default function PersonalInformationScreen() {
             <Ionicons
               name="lock-closed-outline"
               size={48}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
 
             <Text style={styles.notLoggedInTitle}>
@@ -165,7 +165,7 @@ export default function PersonalInformationScreen() {
             <Ionicons
               name="chevron-back-outline"
               size={26}
-              color="#202020"
+              color="#26252A"
             />
           </Pressable>
 
@@ -192,7 +192,7 @@ export default function PersonalInformationScreen() {
               <Ionicons
                 name="person-outline"
                 size={42}
-                color="#1F7A3D"
+                color="#5A1B6F"
               />
             </View>
 
@@ -279,7 +279,7 @@ export default function PersonalInformationScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   header: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   keyboardView: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: 27,
     borderRadius: 45,
     alignSelf: "center",
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   inputGroup: {
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: "800",
-    color: "#292929",
+    color: "#26252A",
   },
 
   inputContainer: {
@@ -366,8 +366,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: "#D7DCD8",
-    backgroundColor: "#FAFBFA",
+    borderColor: "#DED6CC",
+    backgroundColor: "#FBF9F5",
     flexDirection: "row",
     alignItems: "center",
     gap: 11,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 53,
     fontSize: 16,
-    color: "#202020",
+    color: "#26252A",
   },
 
   disabledInputContainer: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     minHeight: 56,
     marginTop: 20,
     borderRadius: 14,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 24,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   notLoggedInText: {
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 25,
     borderRadius: 13,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     alignItems: "center",
     justifyContent: "center",
   },

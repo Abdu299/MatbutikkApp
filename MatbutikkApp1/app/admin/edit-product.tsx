@@ -45,7 +45,7 @@ export default function AdminScreen() {
           <Ionicons
             name="shield-checkmark-outline"
             size={18}
-            color="#1F7A3D"
+            color="#5A1B6F"
           />
 
           <Text style={styles.adminBadgeText}>Adminpanel</Text>
@@ -87,7 +87,7 @@ export default function AdminScreen() {
           <Ionicons
             name="pricetag-outline"
             size={28}
-            color="#1F7A3D"
+            color="#5A1B6F"
           />
         </View>
 
@@ -117,7 +117,7 @@ export default function AdminScreen() {
           <Ionicons
             name="cube-outline"
             size={28}
-            color="#2166A5"
+            color="#3F245E"
           />
         </View>
 
@@ -204,7 +204,7 @@ export default function AdminScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -225,11 +225,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
   },
 
   adminBadgeText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 13,
     fontWeight: "800",
   },
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 30,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     minHeight: 54,
     marginBottom: 28,
     borderRadius: 13,
-    backgroundColor: "#222222",
+    backgroundColor: "#26252A",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontSize: 17,
     fontWeight: "900",
-    color: "#222222",
+    color: "#26252A",
   },
 
   card: {
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E2E5E2",
+    borderColor: "#E5DED5",
   },
 
   cardPressed: {
@@ -299,11 +299,11 @@ const styles = StyleSheet.create({
   },
 
   offerIconBox: {
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
   },
 
   productIconBox: {
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   manageOfferIconBox: {
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 17,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   cardDescription: {

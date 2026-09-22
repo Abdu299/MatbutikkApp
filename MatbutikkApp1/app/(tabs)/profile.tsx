@@ -75,7 +75,7 @@ function ProfileMenuItem({
         <Ionicons
           name={icon}
           size={21}
-          color={danger ? "#B42318" : "#1F7A3D"}
+          color={danger ? "#B42318" : "#5A1B6F"}
         />
       </View>
 
@@ -424,7 +424,7 @@ export default function ProfileScreen() {
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
-            color="#1F7A3D"
+            color="#5A1B6F"
           />
 
           <Text style={styles.loadingText}>
@@ -478,7 +478,7 @@ export default function ProfileScreen() {
                 <Ionicons
                   name="shield-checkmark-outline"
                   size={34}
-                  color="#1F7A3D"
+                  color="#5A1B6F"
                 />
               ) : (
                 <Text style={styles.avatarText}>
@@ -688,7 +688,7 @@ export default function ProfileScreen() {
             <Ionicons
               name="person-outline"
               size={40}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
           </View>
 
@@ -805,7 +805,7 @@ export default function ProfileScreen() {
                 <>
                   <ActivityIndicator
                     size="small"
-                    color="#1F7A3D"
+                    color="#5A1B6F"
                   />
 
                   <Text
@@ -888,7 +888,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   keyboardView: {
@@ -916,7 +916,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 31,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
     marginBottom: 22,
   },
 
@@ -925,7 +925,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -934,7 +934,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -942,7 +942,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 22,
     fontWeight: "900",
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   userInformation: {
@@ -953,7 +953,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 19,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   userEmail: {
@@ -966,7 +966,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 16,
     borderRadius: 16,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -1013,7 +1013,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   menuItem: {
@@ -1024,14 +1024,14 @@ const styles = StyleSheet.create({
   },
 
   menuItemPressed: {
-    backgroundColor: "#F2F5F2",
+    backgroundColor: "#F3EEE7",
   },
 
   menuIcon: {
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: "#EAF3EC",
+    backgroundColor: "#EAF4F2",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1049,7 +1049,7 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 15,
     fontWeight: "800",
-    color: "#202020",
+    color: "#26252A",
   },
 
   menuTitleDanger: {
@@ -1066,7 +1066,7 @@ const styles = StyleSheet.create({
   menuDivider: {
     height: 1,
     marginLeft: 71,
-    backgroundColor: "#ECEFEC",
+    backgroundColor: "#ECE6DE",
   },
 
   logoutButton: {
@@ -1107,7 +1107,7 @@ const styles = StyleSheet.create({
     width: 82,
     height: 82,
     borderRadius: 41,
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
@@ -1117,7 +1117,7 @@ const styles = StyleSheet.create({
   authTitle: {
     fontSize: 30,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
     textAlign: "center",
   },
 
@@ -1138,17 +1138,17 @@ const styles = StyleSheet.create({
     marginBottom: 7,
     fontSize: 14,
     fontWeight: "700",
-    color: "#333333",
+    color: "#26252A",
   },
 
   input: {
     minHeight: 54,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: "#D6DAD6",
+    borderColor: "#DCD4CA",
     borderRadius: 12,
     backgroundColor: "#FFFFFF",
-    color: "#171717",
+    color: "#26252A",
     fontSize: 16,
   },
 
@@ -1165,7 +1165,7 @@ const styles = StyleSheet.create({
   },
 
   forgotPasswordText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 14,
     fontWeight: "800",
   },
@@ -1173,7 +1173,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     marginTop: 6,
     minHeight: 54,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
@@ -1199,7 +1199,7 @@ const styles = StyleSheet.create({
   },
 
   switchTextBold: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 15,
     fontWeight: "800",
   },

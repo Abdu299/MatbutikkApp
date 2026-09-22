@@ -154,7 +154,7 @@ export default function ProductDetailsScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.centerContainer}>
-            <ActivityIndicator size="large" color="#2166A5" />
+            <ActivityIndicator size="large" color="#3F245E" />
             <Text style={styles.loadingText}>Henter produkt...</Text>
           </View>
         </SafeAreaView>
@@ -199,7 +199,7 @@ export default function ProductDetailsScreen() {
             ]}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#202020" />
+            <Ionicons name="arrow-back" size={24} color="#26252A" />
           </Pressable>
 
           <Text style={styles.topBarTitle}>Produktdetaljer</Text>
@@ -220,7 +220,7 @@ export default function ProductDetailsScreen() {
               />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Ionicons name="cube-outline" size={72} color="#2166A5" />
+                <Ionicons name="cube-outline" size={72} color="#3F245E" />
                 <Text style={styles.noImageText}>Ingen bilde</Text>
               </View>
             )}
@@ -264,7 +264,7 @@ export default function ProductDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   topBar: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E3E5E3",
+    borderBottomColor: "#E5DED5",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   topBarPlaceholder: {
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: "#D6E2EE",
+    borderColor: "#E2D7EA",
     backgroundColor: "#FFFFFF",
   },
 
@@ -321,12 +321,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E5EFF8",
+    backgroundColor: "#EEE7F3",
   },
 
   noImageText: {
     marginTop: 10,
-    color: "#52789A",
+    color: "#6E5685",
     fontSize: 14,
     fontWeight: "700",
   },
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "#2166A5",
+    backgroundColor: "#3F245E",
   },
 
   newBadgeText: {
@@ -374,13 +374,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   description: {
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
 
   price: {
     marginTop: 22,
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 28,
     fontWeight: "900",
   },
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
 
   errorTitle: {
     marginTop: 14,
-    color: "#202020",
+    color: "#26252A",
     fontSize: 22,
     fontWeight: "900",
   },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 13,
     borderRadius: 13,
-    backgroundColor: "#2166A5",
+    backgroundColor: "#3F245E",
   },
 
   errorBackButtonText: {

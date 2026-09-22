@@ -13,7 +13,7 @@ export default function AdminLayout() {
       <SafeAreaView
         style={{
           flex: 1,
-          backgroundColor: "#F5F7F5",
+          backgroundColor: "#F7F4EE",
         }}
         edges={["top"]}
       >
@@ -23,7 +23,7 @@ export default function AdminLayout() {
             headerShown: false,
             gestureEnabled: false,
             contentStyle: {
-              backgroundColor: "#F5F7F5",
+              backgroundColor: "#F7F4EE",
             },
           }}
         />

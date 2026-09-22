@@ -166,7 +166,7 @@ export default function OffersScreen() {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#1F7A3D" />
+          <ActivityIndicator size="large" color="#5A1B6F" />
           <Text style={styles.loadingText}>Henter tilbud...</Text>
         </View>
       </SafeAreaView>
@@ -185,11 +185,18 @@ export default function OffersScreen() {
         ]}
         ListHeaderComponent={
           <View style={styles.header}>
+            <Image
+              source={require("../../assets/images/smak-logo.png")}
+              style={styles.brandLogo}
+              resizeMode="contain"
+              accessibilityLabel="Smak – Mat gleder fra hele verden"
+            />
+
             <View style={styles.badge}>
               <Ionicons
                 name="pricetag-outline"
                 size={17}
-                color="#1F7A3D"
+                color="#5A1B6F"
               />
 
               <Text style={styles.badgeText}>Ukens tilbud</Text>
@@ -257,7 +264,7 @@ export default function OffersScreen() {
                     <Ionicons
                       name="basket-outline"
                       size={48}
-                      color="#1F7A3D"
+                      color="#5A1B6F"
                     />
 
                     <Text style={styles.noImageText}>Tilbudsbilde</Text>
@@ -336,7 +343,7 @@ export default function OffersScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -353,6 +360,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
+  brandLogo: {
+    width: 190,
+    height: 86,
+    alignSelf: "center",
+    marginBottom: 18,
+  },
+
   badge: {
     alignSelf: "flex-start",
     flexDirection: "row",
@@ -361,11 +375,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
   },
 
   badgeText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 13,
     fontWeight: "800",
   },
@@ -374,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 32,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -390,7 +404,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   cardPressed: {
@@ -402,7 +416,7 @@ const styles = StyleSheet.create({
     height: 260,
     position: "relative",
     overflow: "hidden",
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
   },
 
   offerImage: {
@@ -475,7 +489,7 @@ const styles = StyleSheet.create({
   offerTitle: {
     fontSize: 19,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   description: {
@@ -495,7 +509,7 @@ const styles = StyleSheet.create({
   offerPrice: {
     fontSize: 22,
     fontWeight: "900",
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   oldPrice: {
@@ -545,7 +559,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 20,
     fontWeight: "900",
-    color: "#303030",
+    color: "#26252A",
   },
 
   emptyText: {

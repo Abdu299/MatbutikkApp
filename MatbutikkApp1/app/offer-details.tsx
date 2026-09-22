@@ -160,7 +160,7 @@ export default function OfferDetailsScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.centerContainer}>
-            <ActivityIndicator size="large" color="#1F7A3D" />
+            <ActivityIndicator size="large" color="#5A1B6F" />
             <Text style={styles.loadingText}>Henter tilbud...</Text>
           </View>
         </SafeAreaView>
@@ -205,7 +205,7 @@ export default function OfferDetailsScreen() {
             ]}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#202020" />
+            <Ionicons name="arrow-back" size={24} color="#26252A" />
           </Pressable>
 
           <Text style={styles.topBarTitle}>Tilbudsdetaljer</Text>
@@ -226,7 +226,7 @@ export default function OfferDetailsScreen() {
               />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Ionicons name="basket-outline" size={72} color="#1F7A3D" />
+                <Ionicons name="basket-outline" size={72} color="#5A1B6F" />
                 <Text style={styles.noImageText}>Ingen bilde</Text>
               </View>
             )}
@@ -270,7 +270,7 @@ export default function OfferDetailsScreen() {
             </View>
 
             <View style={styles.infoBox}>
-              <Ionicons name="time-outline" size={22} color="#1F7A3D" />
+              <Ionicons name="time-outline" size={22} color="#5A1B6F" />
 
               <View style={styles.infoTextContainer}>
                 <Text style={styles.infoLabel}>Tilbudet gjelder</Text>
@@ -287,7 +287,7 @@ export default function OfferDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   topBar: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
-    borderBottomColor: "#E3E5E3",
+    borderBottomColor: "#E5DED5",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   topBarPlaceholder: {
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: "#DDE3DE",
+    borderColor: "#E5DED5",
     backgroundColor: "#FFFFFF",
   },
 
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
   },
 
   noImageText: {
@@ -397,13 +397,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#E1E5E2",
+    borderColor: "#E5DED5",
   },
 
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   description: {
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   },
 
   offerPrice: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 28,
     fontWeight: "900",
   },
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
 
   infoValue: {
     marginTop: 2,
-    color: "#303030",
+    color: "#26252A",
     fontSize: 15,
     fontWeight: "800",
   },
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
 
   errorTitle: {
     marginTop: 14,
-    color: "#202020",
+    color: "#26252A",
     fontSize: 22,
     fontWeight: "900",
   },
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 13,
     borderRadius: 13,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
   },
 
   errorBackButtonText: {

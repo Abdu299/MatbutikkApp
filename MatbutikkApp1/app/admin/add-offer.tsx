@@ -336,7 +336,7 @@ export default function AddOfferScreen() {
           ]}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back-outline" size={21} color="#202020" />
+          <Ionicons name="arrow-back-outline" size={21} color="#26252A" />
           <Text style={styles.adminBackButtonText}>
             Tilbake til administrasjon
           </Text>
@@ -364,7 +364,7 @@ export default function AddOfferScreen() {
               <Ionicons
                 name="hourglass-outline"
                 size={44}
-                color="#1F7A3D"
+                color="#5A1B6F"
               />
 
               <Text style={styles.imagePickerTitle}>
@@ -386,7 +386,7 @@ export default function AddOfferScreen() {
               <Ionicons
                 name="image-outline"
                 size={44}
-                color="#1F7A3D"
+                color="#5A1B6F"
               />
 
               <Text style={styles.imagePickerTitle}>Velg bilde</Text>
@@ -408,7 +408,7 @@ export default function AddOfferScreen() {
               <Ionicons
                 name="images-outline"
                 size={18}
-                color="#1F7A3D"
+                color="#5A1B6F"
               />
 
               <Text style={styles.changeImageText}>Bytt bilde</Text>
@@ -444,7 +444,7 @@ export default function AddOfferScreen() {
           <Ionicons
             name="checkmark-circle-outline"
             size={22}
-            color="#1F7A3D"
+            color="#5A1B6F"
           />
 
           <Text style={styles.informationText}>
@@ -594,7 +594,7 @@ export default function AddOfferScreen() {
               }}
               disabled={isBusy}
               trackColor={{ false: "#D5DAD6", true: "#9CC9A8" }}
-              thumbColor={autoHideEnabled ? "#1F7A3D" : "#FFFFFF"}
+              thumbColor={autoHideEnabled ? "#5A1B6F" : "#FFFFFF"}
             />
 
             <View style={styles.autoHideTextContainer}>
@@ -624,7 +624,7 @@ export default function AddOfferScreen() {
                 <Ionicons
                   name="calendar-outline"
                   size={20}
-                  color="#1F7A3D"
+                  color="#5A1B6F"
                 />
 
                 <Text
@@ -672,7 +672,7 @@ export default function AddOfferScreen() {
                   style={styles.closeModalButton}
                   onPress={() => setShowDatePicker(false)}
                 >
-                  <Ionicons name="close" size={24} color="#333333" />
+                  <Ionicons name="close" size={24} color="#26252A" />
                 </Pressable>
               </View>
 
@@ -727,7 +727,7 @@ export default function AddOfferScreen() {
                         <Ionicons
                           name="checkmark-circle"
                           size={24}
-                          color="#1F7A3D"
+                          color="#5A1B6F"
                         />
                       ) : (
                         <Ionicons
@@ -756,7 +756,7 @@ export default function AddOfferScreen() {
             <Ionicons
               name="checkmark-circle-outline"
               size={22}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
             <Text style={styles.successBannerText}>
               {successMessage}
@@ -830,7 +830,7 @@ export default function AddOfferScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   container: {
@@ -841,7 +841,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: "900",
-    color: "#171717",
+    color: "#26252A",
   },
 
   subtitle: {
@@ -857,13 +857,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 15,
     fontWeight: "800",
-    color: "#242424",
+    color: "#26252A",
   },
 
   imagePicker: {
     height: 220,
     overflow: "hidden",
-    backgroundColor: "#E3EDE5",
+    backgroundColor: "#E9E0EF",
     borderWidth: 1.5,
     borderStyle: "dashed",
     borderColor: "#8CB397",
@@ -886,7 +886,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 17,
     fontWeight: "800",
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   imagePickerText: {
@@ -911,7 +911,7 @@ const styles = StyleSheet.create({
   },
 
   changeImageText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 14,
     fontWeight: "800",
   },
@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
   informationBox: {
     marginTop: 18,
     padding: 14,
-    backgroundColor: "#E7F4EA",
+    backgroundColor: "#EAF4F2",
     borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -940,7 +940,7 @@ const styles = StyleSheet.create({
 
   informationText: {
     flex: 1,
-    color: "#205C32",
+    color: "#3F245E",
     fontSize: 13,
     lineHeight: 19,
   },
@@ -949,11 +949,11 @@ const styles = StyleSheet.create({
     minHeight: 54,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#D8DDD9",
+    borderColor: "#DED6CC",
     borderRadius: 12,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: "#171717",
+    color: "#26252A",
   },
 
   inputError: {
@@ -995,7 +995,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#D8DDD9",
+    borderColor: "#DED6CC",
     backgroundColor: "#FFFFFF",
   },
 
@@ -1019,8 +1019,8 @@ const styles = StyleSheet.create({
   },
 
   checkboxChecked: {
-    borderColor: "#1F7A3D",
-    backgroundColor: "#1F7A3D",
+    borderColor: "#5A1B6F",
+    backgroundColor: "#5A1B6F",
   },
 
   autoHideTextContainer: {
@@ -1030,7 +1030,7 @@ const styles = StyleSheet.create({
   autoHideTitle: {
     fontSize: 15,
     fontWeight: "900",
-    color: "#242424",
+    color: "#26252A",
   },
 
   autoHideDescription: {
@@ -1051,7 +1051,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: "800",
-    color: "#242424",
+    color: "#26252A",
   },
 
   dateButton: {
@@ -1059,8 +1059,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D8DDD9",
-    backgroundColor: "#FAFBFA",
+    borderColor: "#DED6CC",
+    backgroundColor: "#FBF9F5",
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -1069,7 +1069,7 @@ const styles = StyleSheet.create({
   dateButtonText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#202020",
+    color: "#26252A",
   },
 
   datePlaceholderText: {
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   dateModalTitle: {
     fontSize: 21,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   dateModalSubtitle: {
@@ -1137,14 +1137,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: "#E1E5E2",
-    backgroundColor: "#FAFBFA",
+    borderColor: "#E5DED5",
+    backgroundColor: "#FBF9F5",
     flexDirection: "row",
     alignItems: "center",
   },
 
   dateOptionSelected: {
-    borderColor: "#1F7A3D",
+    borderColor: "#5A1B6F",
     backgroundColor: "#EAF5ED",
   },
 
@@ -1160,7 +1160,7 @@ const styles = StyleSheet.create({
   },
 
   dateOptionPrimarySelected: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
   },
 
   dateOptionSecondary: {
@@ -1174,7 +1174,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: "#D8DDD9",
+    borderColor: "#DED6CC",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1189,7 +1189,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     padding: 14,
     borderRadius: 12,
-    backgroundColor: "#E7F4EA",
+    backgroundColor: "#EAF4F2",
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -1197,7 +1197,7 @@ const styles = StyleSheet.create({
 
   successBannerText: {
     flex: 1,
-    color: "#205C32",
+    color: "#3F245E",
     fontSize: 14,
     fontWeight: "700",
   },
@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create({
     marginTop: 28,
     minHeight: 56,
     borderRadius: 13,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -1240,14 +1240,14 @@ const styles = StyleSheet.create({
     marginTop: 12,
     minHeight: 54,
     borderWidth: 1.5,
-    borderColor: "#1F7A3D",
+    borderColor: "#5A1B6F",
     borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
   },
 
   resetButtonText: {
-    color: "#1F7A3D",
+    color: "#5A1B6F",
     fontSize: 15,
     fontWeight: "800",
   },
@@ -1260,7 +1260,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#D8DDD9",
+    borderColor: "#DED6CC",
     backgroundColor: "#FFFFFF",
     flexDirection: "row",
     alignItems: "center",
@@ -1268,7 +1268,7 @@ const styles = StyleSheet.create({
   },
 
   adminBackButtonText: {
-    color: "#202020",
+    color: "#26252A",
     fontSize: 14,
     fontWeight: "800",
   },

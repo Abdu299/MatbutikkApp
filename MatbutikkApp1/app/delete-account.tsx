@@ -266,7 +266,7 @@ export default function DeleteAccountScreen() {
             <Ionicons
               name="lock-closed-outline"
               size={48}
-              color="#1F7A3D"
+              color="#5A1B6F"
             />
 
             <Text style={styles.centerTitle}>
@@ -313,7 +313,7 @@ export default function DeleteAccountScreen() {
             <Ionicons
               name="chevron-back-outline"
               size={26}
-              color="#202020"
+              color="#26252A"
             />
           </Pressable>
 
@@ -438,7 +438,7 @@ export default function DeleteAccountScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F7F5",
+    backgroundColor: "#F7F4EE",
   },
 
   keyboardView: {
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   headerPlaceholder: {
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
     fontSize: 25,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
     textAlign: "center",
   },
 
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 14,
     fontWeight: "800",
-    color: "#292929",
+    color: "#26252A",
   },
 
   input: {
@@ -547,9 +547,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: "#D7DCD8",
+    borderColor: "#DED6CC",
     backgroundColor: "#FFFFFF",
-    color: "#202020",
+    color: "#26252A",
     fontSize: 16,
   },
 
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     fontSize: 23,
     fontWeight: "900",
-    color: "#202020",
+    color: "#26252A",
   },
 
   loginButton: {
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 24,
     borderRadius: 13,
-    backgroundColor: "#1F7A3D",
+    backgroundColor: "#5A1B6F",
     alignItems: "center",
     justifyContent: "center",
   },
