@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -24,6 +25,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "../../context/AuthContext";
 import { auth, db } from "../../firebase/firebaseConfig";
+
+const APP_NAME = "Smak Carl Berner";
+const OWNER_NAME = "SMAK CARL BERNER AS";
+
+const SUPPORT_SITE =
+  "https://butikkapp-support-site.vercel.app";
+
+const URL_PARAMETERS =
+  `app=${encodeURIComponent(APP_NAME)}` +
+  `&owner=${encodeURIComponent(OWNER_NAME)}`;
+
+const HELP_URL =
+  `${SUPPORT_SITE}/hjelp?${URL_PARAMETERS}`;
+
+const PRIVACY_URL =
+  `${SUPPORT_SITE}/vilkar-og-personvern?${URL_PARAMETERS}`;
 
 type ProfileMenuItemProps = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -103,11 +120,27 @@ export default function ProfileScreen() {
   const [isSubmitting, setIsSubmitting] =
     useState(false);
 
-  function showComingSoon(title: string) {
-    Alert.alert(
-      title,
-      "Denne funksjonen blir tilgjengelig senere."
-    );
+  async function openExternalPage(url: string) {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error("Kunne ikke åpne nettsiden:", error);
+
+      if (
+        Platform.OS === "web" &&
+        typeof window !== "undefined"
+      ) {
+        window.alert(
+          "Kunne ikke åpne siden. Prøv igjen senere."
+        );
+        return;
+      }
+
+      Alert.alert(
+        "Kunne ikke åpne siden",
+        "Prøv igjen senere."
+      );
+    }
   }
 
   async function handleLogin() {
@@ -397,9 +430,7 @@ export default function ProfileScreen() {
               title="Hjelp og kundeservice"
               subtitle="Finn svar eller kontakt butikken"
               onPress={() =>
-                showComingSoon(
-                  "Hjelp og kundeservice"
-                )
+                void openExternalPage(HELP_URL)
               }
             />
 
@@ -410,9 +441,7 @@ export default function ProfileScreen() {
               title="Vilkår og personvern"
               subtitle="Les våre vilkår og personvernregler"
               onPress={() =>
-                showComingSoon(
-                  "Vilkår og personvern"
-                )
+                void openExternalPage(PRIVACY_URL)
               }
             />
 
