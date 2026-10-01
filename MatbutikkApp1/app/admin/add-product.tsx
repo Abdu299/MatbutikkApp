@@ -64,7 +64,8 @@ export default function AddProductScreen() {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: false,
+        allowsEditing: true,
+        aspect: [4, 3],
         quality: 0.8,
       });
 
@@ -335,7 +336,7 @@ export default function AddProductScreen() {
             <Image
               source={{ uri: imageUri }}
               style={styles.image}
-              resizeMode="contain"
+              resizeMode="cover"
             />
           ) : (
             <View style={styles.imagePlaceholder}>
@@ -767,7 +768,7 @@ const styles = StyleSheet.create({
   },
 
   imagePicker: {
-    aspectRatio: 4 / 3,
+    height: 220,
     overflow: "hidden",
     backgroundColor: "#E9E0EF",
     borderWidth: 1.5,
